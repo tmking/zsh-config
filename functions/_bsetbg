@@ -1,0 +1,10 @@
+#compdef bsetbg bsetroot
+
+case $words in
+    *-solid*)
+        _x_color ;;
+    *)
+        _files
+esac
+
+

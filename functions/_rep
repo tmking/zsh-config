@@ -1,0 +1,13 @@
+#compdef zinit rc.init
+
+local expl
+
+case ${#words} in
+    3)
+	_command_names ;;
+    *)
+        _files
+esac
+
+
+

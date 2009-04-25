@@ -1,0 +1,14 @@
+#compdef email
+
+local acnts args
+
+acnts=( $(cat ~/.emailrc | cut -d' ' -f1) )
+args=( get check read delete )
+
+case ${#words} in
+    2)	_values "$words[1] arg:" $args ;;
+    *)  _values 'available accounts:' $acnts:t
+esac
+
+
+
