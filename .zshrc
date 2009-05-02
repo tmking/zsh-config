@@ -26,11 +26,11 @@ zmodload -i zsh/stat
 
 ## start ssh keychain and source files
 if which gpg >/dev/null 2>&1; then
-    local gpg_key=$(gpg --list-keys $USER | grep pub | cut -d'/' -f2 | cut -d' ' -f1)
+    local gpg_key=$(gpg --list-keys $USER 2>/dev/null| grep pub | cut -d'/' -f2 | cut -d' ' -f1)
 fi
 
 if which keychain >/dev/null 2>&1; then
-    keychain -q -Q id_rsa $gpg_key
+    keychain -q -Q id_rsa $gpg_key 2>/dev/null
     local ssh_file="$HOME/.keychain/$HOSTNAME-sh"
     local gpg_file="$HOME/.keychain/$HOSTNAME-sh-gpg"
     [ -f "$ssh_file" ] && . $ssh_file
@@ -38,9 +38,12 @@ if which keychain >/dev/null 2>&1; then
 fi
 
 ## source other files
-. $ZDOTDIR/.zprompt 2>/dev/null
 . $ZDOTDIR/.aliasrc 2>/dev/null
 . $HOME/.aliasrc 2>/dev/null
+
+## load prompt
+setopt promptsubst
+prompt zork -p blue -d white -l WHITE -u BLUE --files --dirs --com --shorthost --tty
 
 ## load color config for ls
 if [ -f /etc/DIR_COLORS ]; then
@@ -95,7 +98,7 @@ hosts=( `</etc/hosts| grep -v \#` )
 )
 
 ## load personal functions
-for func in $ZDOTDIR/functions/*; do
+for func in $ZDOTDIR/functions/*(N); do
 	autoload -Uz $func:t
 done
 compdef _hosts links yafc
@@ -249,6 +252,7 @@ reload()
 {
     [ "$TERM" = xterm ] && print -Pn '%{\e]0;[ reloading... ]\a%}'
     unhash -a -f -m \*
+    local tstamp=$(date +%S)
     . $ZDIR/zshenv 2>/dev/null
     . $ZDIR/zshrc 2>/dev/null
     . $ZDOTDIR/.zshenv 2>/dev/null
@@ -256,8 +260,8 @@ reload()
 
     zrecompile -p -- \
 	-R $ZDOTDIR/.zshrc -- \
-	-M $ZDOTDIR/.zcompdump \
-	-M $ZDOTDIR/functions/**/*.zwc
+	-M $ZDOTDIR/.zcompdump -- \
+	-M $ZDOTDIR/functions/**/*.zwc(N)
 
     for f in $ZDOTDIR/functions/**/*(.N); do
 	case $f in 
@@ -268,6 +272,8 @@ reload()
     done
 
     precmd 2>/dev/null
+    local tstamp2=$(( $(date +%S) - $tstamp ))
+    print "config reloaded in $tstamp2 seconds"
 }
 
 showcfg() 
@@ -361,7 +367,4 @@ smartpager()
     fi
 }
 
-if [ "$tstamp" ]; then
-    tstamp=$(( $(date +%s) - $tstamp ))
-    print loaded in $tstamp seconds && unset tstamp
-fi
+

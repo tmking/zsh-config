@@ -1,5 +1,5 @@
 .history
 .zcompcache/
 .zcompdump
-.*.zwc
-*.zwc
+.*.zwc*
+*.zwc*

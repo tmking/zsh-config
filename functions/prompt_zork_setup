@@ -8,6 +8,7 @@ We accept the following arguments
 -u --userhost [color] (color of user/host string)
 --24 (use 24 hour clock instead of 12 hour)
 --com (show command number/job exit status)
+--tty (show tty number)
 --files (show count of regular/hidden files)
 --dirs (show count of regular/hidden dirs)
 --shorthost (show short hostname instead of fqdn)
@@ -59,6 +60,9 @@ prompt_zork_parse_args()
 	    --dirs)
 		show_dirs=yes
 		;;
+	    --tty)
+		show_tty=yes
+		;;
 	    --com)
 		show_com=yes
 		;;
@@ -94,13 +98,15 @@ git_func()
     [ -d "$PWD/.git" ] || return
 
     local branch=$(git branch | grep \* | cut -d' ' -f2)
-    local str="%b%f%k$clr[userhost]""git$colon"
 
     case $(git --no-pager status) in
         *"nothing to commit"*)
             psvar[2]=" git$lp$clr[lite]$branch$rp"
             ;;
-        *)
+        *"Untracked files"*)
+	    psvar[2]="git$lp%b%f%k%B%F{red}$branch$rp"
+	    ;;
+	*)
             psvar[2]=" git$lp%b%f%k%F{red}$branch$rp"
             ;;
     esac
@@ -108,6 +114,7 @@ git_func()
 
 prompt_zork_preexec()
 {
+    [ "$DISPLAY" ] || return
     titlebar_length=${TB_LENGTH:-$titlebar_length}
     case $1 in
         %*)
@@ -125,16 +132,15 @@ prompt_zork_precmd()
     git_func
     ls_count
  
-    if [ "$DISPLAY" ]; then
-	local jobs=
-	psvar[1]=""
-	local j=${(Mw)#jobstates#suspended:}
-	if [ $j -gt 0 ]; then
-	    jobs=" [ $j+ ]"
-	    psvar[1]=( " $j+" )
-	fi
-	print -Pn "%{\e]0;[ $host ] [ %n ] [ %30<...<%2c%<< ] [ %h:%l ]$jobs\a%}"
+    local jobs=
+    psvar[1]=""
+    local j=${(Mw)#jobstates#suspended:}
+    if [ $j -gt 0 ]; then
+	jobs=" [ $j+ ]"
+	psvar[1]=( " $j+" )
     fi
+    [ "$DISPLAY" ] && 
+    print -Pn "%{\e]0;[ $host ] [ %n ] [ %30<...<%2c%<< ] [ %h:%l ]$jobs\a%}"
 }
 
 prompt_zork_setup()
@@ -149,7 +155,7 @@ prompt_zork_setup()
     host=%M
     local show_date=1
     local show_clock=1
-    unset show_files show_dirs show_com
+    unset show_files show_dirs show_com show_tty
 
     typeset -A clr    
     if [ "$UID" = 0 ]; then
@@ -180,17 +186,27 @@ prompt_zork_setup()
     local slash="%b$clr[paren]/$clr[lite]"
     colon="%b$clr[paren]:$clr[lite]"
     
-    [ "$show_date" ] && local ps_date=" $clr[dark]$str_date$lp$clr[lite]%D{%m}$slash%D{%d}$slash%D{%y}$rp"
-    [ "$show_clock" ] && local ps_clock=" $clr[dark]$str_clock$lp$clr[lite]%D{$hr}$colon%D{%M}$colon%D{%S}$rp"
-    [ "$show_files" ] && local ps_file=" $clr[dark]$str_file$lp$clr[lite]%5v$slash%6v$rp"
-    [ "$show_dirs" ] && local ps_dir=" $clr[dark]$str_dir$lp$clr[lite]%7v$slash%8v$rp"
+    [ "$show_date" ] && local ps_date=" $clr[dark]$str_date$lp%D{%m}$slash%D{%d}$slash%D{%y}$rp"
+    [ "$show_clock" ] && local ps_clock=" $clr[dark]$str_clock$lp%D{$hr}$colon%D{%M}$colon%D{%S}$rp"
+    [ "$show_files" ] && local ps_file=" $clr[dark]$str_file$lp%5v$slash%6v$rp"
+    [ "$show_dirs" ] && local ps_dir=" $clr[dark]$str_dir$lp%7v$slash%8v$rp"
+    if [ "$show_tty" ]; then
+	if [ "$DISPLAY" ]; then
+	    local str_tty=$(echo $TTY | cut -d'/' -f3)
+	    local tty_num=$TTY:t
+	else
+	    local str_tty=tty
+	    local tty_num=$TTY:t
+	fi
+	local ps_tty=" $clr[dark]$str_tty$lp$tty_num$rp"
+    fi
     [ "$show_com" ] && local ps_com=" $clr[dark]$str_com$lp$clr[lite]%h$slash%?$rp"
     
     local ps_userhost="$clr[userhost]%n$clr[paren]@$clr[userhost]$host%b"
 
     local ps_wdir="$lp$clr[lite]%45<...<%~%<<$rp$clr[dark]"
 
-    local ps_line1="$lb$ps_date$ps_clock$ps_file$ps_dir$ps_com$clr[lite]%1v$clr[dark]"$'${psvar[2]}'" $rb"
+    local ps_line1="$lb$ps_date$ps_clock$ps_file$ps_dir$ps_tty$ps_com$clr[lite]%1v$clr[dark]"$'${psvar[2]}'" $rb"
     local ps_line2="$lb $ps_userhost$ps_wdir $rb"
     local ps_line3=" $clr[userhost]%#$clr[dark]-$clr[paren]>%b%f%k"
 

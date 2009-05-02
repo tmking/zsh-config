@@ -1,4 +1,3 @@
-tstamp=$(date +%s)
 export ZDOTDIR=$HOME/.zsh
 export HOSTNAME=$(hostname)
 export LANG=en_US.UTF-8
