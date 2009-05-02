@@ -1,3 +1,3 @@
 if [[ -o interactive ]]; then
-	case $TERM in linux) clear ;; esac
+	[ "$DISPLAY" ] || clear
 fi

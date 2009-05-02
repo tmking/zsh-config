@@ -1,7 +1,8 @@
 prompt_zork_help()
 {
     cat <<EOF
-We accept the following arguments
+We accept the following arguments:
+
 -p --paren [color] (color of parentheses)
 -d --dark [color] (color of labels)
 -l --lite [color] (color of variable data)
