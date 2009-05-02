@@ -1,0 +1,207 @@
+prompt_zork_help()
+{
+    cat <<EOF
+We accept the following arguments
+-p --paren [color] (color of parentheses)
+-d --dark [color] (color of labels)
+-l --lite [color] (color of variable data)
+-u --userhost [color] (color of user/host string)
+--24 (use 24 hour clock instead of 12 hour)
+--com (show command number/job exit status)
+--files (show count of regular/hidden files)
+--dirs (show count of regular/hidden dirs)
+--shorthost (show short hostname instead of fqdn)
+EOF
+}
+
+set_colors()
+{
+
+    case $2 in 
+	BLACK|RED|GREEN|YELLOW|BLUE|MAGENTA|CYAN|WHITE)
+	    clr[$1]="%b%B%F{${(L)2}}"
+	    ;;
+	black|red|green|yellow|blue|magenta|cyan|white)
+	    clr[$1]="%b%F{$2}"
+	    ;;
+    esac
+}
+
+prompt_zork_parse_args()
+{
+    while [ -n "$*" ]; do
+
+	case $1 in
+	    -p|--paren)
+		set_colors paren $2; shift
+		;;
+	    -d|--dark)
+		set_colors dark $2; shift
+		;;
+	    -l|--lite)
+		set_colors lite $2; shift
+		;;
+	    -u|--userhost)
+		set_colors userhost $2; shift
+		;;
+	    -24)
+		hr="%H"
+		;;
+	    --date)
+		show_date=yes
+		;;
+	    --clock)
+		show_clock=yes
+		;;
+	    --files)
+		show_files=yes
+		;;
+	    --dirs)
+		show_dirs=yes
+		;;
+	    --com)
+		show_com=yes
+		;;
+	    --shorthost)
+		host="%m"
+	esac
+	shift
+    done
+}
+
+ls_count() 
+{
+    for n in 5 6 7 8; do
+	psvar[$n]=""
+    done
+
+    local -a f hf d hd
+
+    f=( *(.N) )
+    hf=( .*(.N) )
+    d=( *(/N) )
+    hd=( .*(/N) )
+
+    psvar[5]=${#f}
+    psvar[6]=${#hf}
+    psvar[7]=${#d}
+    psvar[8]=${#hd}
+}
+
+git_func()
+{
+    psvar[2]=""
+    [ -d "$PWD/.git" ] || return
+
+    local branch=$(git branch | grep \* | cut -d' ' -f2)
+    local str="%b%f%k$clr[userhost]""git$colon"
+
+    case $(git --no-pager status) in
+        *"nothing to commit"*)
+            psvar[2]=" git$lp$clr[lite]$branch$rp"
+            ;;
+        *)
+            psvar[2]=" git$lp%b%f%k%F{red}$branch$rp"
+            ;;
+    esac
+}
+
+prompt_zork_preexec()
+{
+    titlebar_length=${TB_LENGTH:-$titlebar_length}
+    case $1 in
+        %*)
+	    cmd=%%$1:gs/%//
+	    ;;
+        *)      
+	    cmd="$(echo $1 | tr \\n " ")"
+    esac
+
+    print -Pn "%{\e]0;[ $host ] [ %n ] [ %D{$hr}:%D{%M}: %$titlebar_length>...>% $cmd%>> ]\a%}"
+}
+
+prompt_zork_precmd()
+{
+    git_func
+    ls_count
+ 
+    if [ "$DISPLAY" ]; then
+	local jobs=
+	psvar[1]=""
+	local j=${(Mw)#jobstates#suspended:}
+	if [ $j -gt 0 ]; then
+	    jobs=" [ $j+ ]"
+	    psvar[1]=( " $j+" )
+	fi
+	print -Pn "%{\e]0;[ $host ] [ %n ] [ %30<...<%2c%<< ] [ %h:%l ]$jobs\a%}"
+    fi
+}
+
+prompt_zork_setup()
+{
+    if ! setopt | grep -q promptsubst; then
+	echo "please put 'setopt promptsubst' into your .zshrc or this prompt won't work"
+	return 127
+    fi
+
+    titlebar_length=35
+    hr=%I
+    host=%M
+    local show_date=1
+    local show_clock=1
+    unset show_files show_dirs show_com
+
+    typeset -A clr    
+    if [ "$UID" = 0 ]; then
+	clr[paren]=%B%F{blue}
+	clr[dark]=%F{white}
+	clr[lite]=%B%F{white}
+	clr[userhost]=%B%F{red}
+    else
+	clr[paren]="%F{cyan}"
+	clr[dark]="%B%F{black}"
+	clr[lite]="%F{white}"
+	clr[userhost]="%B%F{cyan}"
+    fi
+
+    local str_clock=lc
+    local str_date=d
+    local str_com=com
+    local str_git=git
+    local str_dir=dirs
+    local str_file=files
+    
+    prompt_zork_parse_args "$@"
+
+    local lb="$clr[paren]["
+    local rb="$clr[paren]]"
+    lp="%b$clr[paren]($clr[lite]"
+    rp="%b$clr[paren])"
+    local slash="%b$clr[paren]/$clr[lite]"
+    colon="%b$clr[paren]:$clr[lite]"
+    
+    [ "$show_date" ] && local ps_date=" $clr[dark]$str_date$lp$clr[lite]%D{%m}$slash%D{%d}$slash%D{%y}$rp"
+    [ "$show_clock" ] && local ps_clock=" $clr[dark]$str_clock$lp$clr[lite]%D{$hr}$colon%D{%M}$colon%D{%S}$rp"
+    [ "$show_files" ] && local ps_file=" $clr[dark]$str_file$lp$clr[lite]%5v$slash%6v$rp"
+    [ "$show_dirs" ] && local ps_dir=" $clr[dark]$str_dir$lp$clr[lite]%7v$slash%8v$rp"
+    [ "$show_com" ] && local ps_com=" $clr[dark]$str_com$lp$clr[lite]%h$slash%?$rp"
+    
+    local ps_userhost="$clr[userhost]%n$clr[paren]@$clr[userhost]$host%b"
+
+    local ps_wdir="$lp$clr[lite]%45<...<%~%<<$rp$clr[dark]"
+
+    local ps_line1="$lb$ps_date$ps_clock$ps_file$ps_dir$ps_com$clr[lite]%1v$clr[dark]"$'${psvar[2]}'" $rb"
+    local ps_line2="$lb $ps_userhost$ps_wdir $rb"
+    local ps_line3=" $clr[userhost]%#$clr[dark]-$clr[paren]>%b%f%k"
+
+    PS1="
+${ps_line1}
+${ps_line2}
+${ps_line3} "
+    PS2=" $clr[userhost]%#$clr[dark] %_$clr[dark]-$clr[paren]>%b%f%k "
+
+    add-zsh-hook precmd prompt_zork_precmd
+    add-zsh-hook preexec prompt_zork_preexec
+}
+
+prompt_zork_setup "$@"
