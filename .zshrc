@@ -5,9 +5,23 @@ case $- in
 	*)	return
 esac
 
-autoload -Uz compinit promptinit run-help colors
+## set paths (regular path is set in zshenv to 
+## ensure it is used by non-interactive shells
+cdpath=( . ~/ )
+case $fpath[-1] in
+    $ZDOTDIR/functions*)
+        : ;;
+    *)
+	local -a old_fpath; old_fpath=( $fpath )
+	fpath=( $ZDOTDIR/**/*(/N) )
+	fpath+=( $old_fpath )
+esac
+fignore=(.o .c~ \~ .\~)
+
+autoload -Uz compinit promptinit run-help colors zrecompile
 compinit -i
 promptinit
+zrecompile
 zmodload -i zsh/stat
 
 ## start ssh keychain and source files
@@ -79,26 +93,10 @@ hosts=( `</etc/hosts| grep -v \#` )
 	 `grep -w Host ~/.ssh/config | sed 's/=//g' | cut -d' ' -f2 | tr -d '*'`
 	$hosts
 )
-## set paths (regular path is set in zshenv to 
-## ensure it is used by non-interactive shells
-cdpath=( . ~/ )
-mailpath=( ~/Mail/inbox'=> new mail')
-case $fpath[-1] in
-    $ZDOTDIR/functions)
-        : ;;
-    *)
-	echo here
-	fpath+=( $ZDOTDIR/functions )
-	for d in $ZDOTDIR/functions/*(/N); do
-	    fpath+=( $d )
-	done
-esac
-
-fignore=(.o .c~ \~ .\~)
 
 ## load personal functions
-for func in $ZDOTDIR/functions/_*; do
-	autoload basename $func:t
+for func in $ZDOTDIR/functions/*; do
+	autoload -Uz $func:t
 done
 compdef _hosts links yafc
 compdef _rsync rsync
@@ -253,8 +251,22 @@ reload()
     unhash -a -f -m \*
     . $ZDIR/zshenv 2>/dev/null
     . $ZDIR/zshrc 2>/dev/null
-    . $ZDOTDIR/.zshrc 2>/dev/null
     . $ZDOTDIR/.zshenv 2>/dev/null
+    . $ZDOTDIR/.zshrc 2>/dev/null
+
+    zrecompile -p -- \
+	-R $ZDOTDIR/.zshrc -- \
+	-M $ZDOTDIR/.zcompdump \
+	-M $ZDOTDIR/functions/**/*.zwc
+
+    for f in $ZDOTDIR/functions/**/*(.N); do
+	case $f in 
+	    *.zwc*) : ;;
+	    *)
+		unfunction $f:t && autoload -Uz $f:t
+	esac
+    done
+
     precmd 2>/dev/null
 }
 
@@ -299,8 +311,8 @@ hinfo()
 zrec() 
  {
      zrecompile "$@" -p -- \
-         -R ~/.zshrc -- \
-         -R ~/.zdump -- \
+         -R $ZDOTDIR/.zshrc -- \
+         -R $ZDOTDIR/.z*dump -- \
          -R ~/lib/zsh/comp/Core/compinit -- \
          -R ~/lib/zsh/comp/Core/compaudit -- \
          -R ~/lib/zsh/comp/Core/compdump -- \
@@ -349,6 +361,7 @@ smartpager()
     fi
 }
 
-tstamp=$(( $(date +%s) - $tstamp ))
-
-print loaded in $tstamp seconds && unset tstamp
+if [ "$tstamp" ]; then
+    tstamp=$(( $(date +%s) - $tstamp ))
+    print loaded in $tstamp seconds && unset tstamp
+fi
