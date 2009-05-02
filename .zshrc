@@ -24,6 +24,7 @@ if which keychain >/dev/null 2>&1; then
 fi
 
 ## source other files
+. $ZDOTDIR/.zprompt 2>/dev/null
 . $ZDOTDIR/.aliasrc 2>/dev/null
 . $HOME/.aliasrc 2>/dev/null
 
@@ -82,7 +83,17 @@ hosts=( `</etc/hosts| grep -v \#` )
 ## ensure it is used by non-interactive shells
 cdpath=( . ~/ )
 mailpath=( ~/Mail/inbox'=> new mail')
-fpath+=( $ZDOTDIR/functions )
+case $fpath[-1] in
+    $ZDOTDIR/functions)
+        : ;;
+    *)
+	echo here
+	fpath+=( $ZDOTDIR/functions )
+	for d in $ZDOTDIR/functions/*(/N); do
+	    fpath+=( $d )
+	done
+esac
+
 fignore=(.o .c~ \~ .\~)
 
 ## load personal functions
