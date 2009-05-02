@@ -2,7 +2,7 @@
 
 local files args
 
-files=( ~/playlists/**/*(N.) )
+files=( ~student/playlists/**/*(N.) )
 
 case ${#words} in
     2)	
