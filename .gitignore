@@ -3,4 +3,5 @@
 .zcompdump
 .*.zwc*
 *.zwc*
-'promptrc
+.promptrc
+TODO
