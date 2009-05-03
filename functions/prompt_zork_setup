@@ -116,10 +116,12 @@ prompt_zork_ls_count()
 
 prompt_zork_git_func()
 {
-    psvar[2]=""
+    psvar[2,9]=""
     [ -d "$PWD/.git" ] || return
 
     local branch=$(git branch | grep \* | cut -d' ' -f2)
+
+    psvar[9]=" [ git:$branch ]"
 
     case $(git --no-pager status) in
         *"nothing to commit"*)
@@ -171,7 +173,7 @@ prompt_zork_precmd()
 	jobs=" [ $j+ ]"
 	psvar[1]=( " $j+" )
     fi
-    prompt_zork_is_console || print -Pn "%{\e]0;[ $host ] [ %n ] [ %30<...<%2c%<< ] [ %h:%l ]$jobs\a%}"
+    prompt_zork_is_console || print -Pn "%{\e]0;[ $host ] [ %n ] [ %30<...<%2c%<< ]%9v [ %h:%l ]$jobs\a%}"
 }
 
 prompt_zork_setup()
