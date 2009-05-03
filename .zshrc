@@ -42,7 +42,7 @@ fi
 
 ## load prompt
 setopt promptsubst
-prompt zork -p blue -d white -l WHITE -u BLUE --files --dirs --com --shorthost --tty
+prompt zork
 
 ## load color config for ls
 if [ -f /etc/DIR_COLORS ]; then
