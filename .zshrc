@@ -21,7 +21,6 @@ fignore=(.o .c~ \~ .\~)
 autoload -Uz compinit promptinit run-help colors zrecompile
 compinit -i
 promptinit
-zrecompile
 zmodload -i zsh/stat
 
 ## start ssh keychain and source files
