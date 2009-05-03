@@ -97,9 +97,7 @@ prompt_zork_parse_args()
 
 prompt_zork_ls_count() 
 {
-    for n in 5 6 7 8; do
-	psvar[$n]=""
-    done
+    psvar[5,6,7,8]=""
 
     local -a f hf d hd
 
@@ -119,7 +117,7 @@ prompt_zork_git_func()
     psvar[2,9]=""
     [ -d "$PWD/.git" ] || return
 
-    local branch=$(git branch | grep \* | cut -d' ' -f2)
+    local branch=${$(git branch | grep \* | cut -d' ' -f2):-UNNAMED}
 
     psvar[9]=" [ git:$branch ]"
 
@@ -127,12 +125,13 @@ prompt_zork_git_func()
         *"nothing to commit"*)
             psvar[2]=" git$lp$clr[lite]$branch$rp"
             ;;
-        *"Untracked files"*)
-	    psvar[2]="git$lp%b%f%k%B%F{red}$branch$rp"
+	*"not updated"*)
+            psvar[2]=" git$lp$clr[git_dirty]$branch$rp"
 	    ;;
-	*)
-            psvar[2]=" git$lp%b%f%k%F{red}$branch$rp"
-            ;;
+        *"Untracked files"*)
+	    psvar[2]="git$lp$clr[git_untracked]$branch$rp"
+	    ;;
+
     esac
 }
 
@@ -180,8 +179,8 @@ prompt_zork_setup()
 {
     setopt promptsubst
 
-    ## these variables can't be local because precmd() and 
-    ## preexec() need them
+    ## these variables can't be local because 
+    ## precmd() and preexec() need them
     titlebar_length=50
     hr=%I
     host=%M
@@ -193,7 +192,7 @@ prompt_zork_setup()
     local show_files=1
     local show_dirs=1
 
-    typeset -A clr    
+    typeset -Ag clr    
     if [ "$UID" = 0 ]; then
 	clr[paren]=%B%F{blue}
 	clr[dark]=%F{white}
@@ -205,6 +204,9 @@ prompt_zork_setup()
 	clr[lite]=%F{white}
 	clr[userhost]=%B%F{cyan}
     fi
+
+    clr[git_untracked]="%F{yellow}"
+    clr[git_dirty]="%B%F{red}"
 
     local str_clock=lc
     local str_date=d
