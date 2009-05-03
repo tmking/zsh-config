@@ -249,7 +249,6 @@ lsl() { lsFunc links $@ }
 
 reload() 
 {
-	echo HERE
     [ "$TERM" = xterm ] && print -Pn '%{\e]0;[ reloading... ]\a%}'
     unhash -a -f -m \*
     local tstamp=$(date +%S)
