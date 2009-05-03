@@ -89,7 +89,7 @@ prompt_zork_git_func()
             psvar[2]=" git$lp$rs$clr[lite]$branch$rp"
             ;;
         *"Untracked files"*)
-	    psvar[2]="git$lp$rs%{$fg_bold[red]%}$branch$rp"
+	    psvar[2]=" git$lp$rs%{$fg_bold[red]%}$branch$rp"
 	    ;;
 	*)
             psvar[2]=" git$lp$rs%{$fg[red]%}$branch$rp"
@@ -140,7 +140,6 @@ prompt_zork_precmd()
 
 prompt_zork_setup()
 {
-    setopt promptsubst
     autoload -Uz colors
     colors
 
@@ -152,7 +151,10 @@ prompt_zork_setup()
 
     local show_date=1
     local show_clock=1
-    unset show_files show_dirs show_commands show_tty
+    local show_files=1
+    local show_dirs=1
+    local show_commands=1
+    local show_tty=1
 
     typeset -A clr    
     if [ "$UID" = 0 ]; then

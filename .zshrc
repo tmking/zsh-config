@@ -36,11 +36,12 @@ if which keychain >/dev/null 2>&1; then
     [ -f "$gpg_file" ] && . $gpg_file
 fi
 
-## source other files
+## source other files for compatibility
 . $ZDOTDIR/.aliasrc 2>/dev/null
 . $HOME/.aliasrc 2>/dev/null
 
-## load prompt
+## load prompt. Note that promptsubst has to be set here or the
+## git string will be gibberish
 setopt promptsubst
 prompt zork
 
@@ -85,15 +86,14 @@ REPORTTIME=60
 HISTSIZE=3000
 SAVEHIST=3000
 HISTFILE=$ZDOTDIR/.history
-HELPDIR=/usr/share/zsh/zsh-help
+HELPDIR=/usr/share/zsh/help
 DIRSTACKSIZE=20
 MAILCHECK=60
 
 ## array for host completion
 hosts=( `</etc/hosts| grep -v \#` )
-[ -e $HOME/.ssh/config ] && hosts=(
+[ -e $HOME/.ssh/config ] && hosts+=(
 	 `grep -w Host ~/.ssh/config | sed 's/=//g' | cut -d' ' -f2 | tr -d '*'`
-	$hosts
 )
 
 ## load personal functions
@@ -102,11 +102,8 @@ for func in $ZDOTDIR/functions/*(N); do
 done
 compdef _hosts links yafc
 compdef _rsync rsync
-compdef _bsetbg bsetbg
 compdef _x_color bsetroot
 compdef _build build
-compdef _rep rep
-compdef _email email
 compdef _zplay zplay
 compdef _notes note
 compdef _tar star
@@ -121,7 +118,7 @@ zstyle ':completion:predict:*' completer _complete
 zstyle ':completion:*' menu select=20
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format $'\e[44m\e[1;37mCompleting %d\e[0m'
-zstyle ':completion:*:(ssh|scp|sftp|rsync):*' hosts $hosts
+zstyle ':completion:*:(ssh|scp|sftp|rsync|git):*' hosts $hosts
 zstyle ':completion:*:*:kill:*:jobs' list-colors 'no=01;31'
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*' list-colors "$LS_COLORS"
@@ -141,7 +138,8 @@ bindkey '\e[5~' history-search-backward  #page up
 bindkey '\e[6~' history-search-forward   #page down
 bindkey '\e[1~' beginning-of-line
 bindkey '\e[4~' end-of-line
-case $TERM in (xterm*|*rxvt*)
+# set home and end key in X terminals
+case $TERM in (xterm*|*rxvt*|Eterm*|*cygwin*)
 	bindkey '^[[7~' beginning-of-line
 	bindkey '^[[8~' end-of-line ;;
 esac
@@ -180,7 +178,7 @@ alias cp='nocorrect cp -i'
 alias mkdir='nocorrect mkdir'
 alias rm='nocorrect rm -i'
 
-## A handy set of aliases for users in the 'sudo' group
+## Things to set up if I'm in the 'sudo' group
 if [ "$UID" -ge 1000 ] && groups $USER | grep -q sudo; then
     if [ -e /etc/debian_version ]; then
 	for b in /usr/bin/{apt*(N),dpkg*(N),deb*(N)} /usr/sbin/dpkg*; do
@@ -201,9 +199,25 @@ if [ "$UID" -ge 1000 ] && groups $USER | grep -q sudo; then
     alias modprobe='sudo modprobe'
     alias rmmod='sudo rmmod'
     alias iptables='sudo iptables'
+
+    ## this will modify root's .zshrc to capture our settings.
+    ## this is good for carrying over the prompt.
+    local rootzshrc=/root/.zsh/.zshrc
+    if ! grep -q "## automatically modified" $rootzshrc 2>/dev/null; then
+	local tmprc=$PWD/.zshrc.$RANDOM
+	print "modifying root .zshrc"
+	[ -f "$rootzshrc" ] && sudo mv -f $rootzshrc $rootzshrc.old
+	echo "## automatically modified by $USER on $(date)" >$tmprc
+	echo "[ -d /usr/NX/bin ] && path+=( /usr/NX/bin )" >>$tmprc
+	[ -d "$HOME/bin" ] && echo "path+=( $HOME/bin )" >>$tmprc
+	echo "fpath+=( $ZDOTDIR/functions )" >>$tmprc
+	echo ". $ZDOTDIR/.zshrc">>$tmprc
+	echo "[ " '$PWD' " = $HOME ] && cd" >>$tmprc
+	sudo mv $tmprc $rootzshrc && rm -f $tmprc
+    fi
 fi
 
-##functions
+## functions
 lsExec()
 {
     do=$1; shift
