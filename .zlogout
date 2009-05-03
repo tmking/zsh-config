@@ -1,5 +1,5 @@
 if [[ -o interactive ]]; then
-	if [ "$DISPLAY" ] && [ -z "$SSH_TTY" ]; then
+	if [ -z "$DISPLAY" ] || [ -z "$SSH_TTY" ]; then
 	    clear
 	fi
 fi
