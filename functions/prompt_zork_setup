@@ -172,10 +172,10 @@ prompt_zork_setup()
 
     typeset -A clr    
     if [ "$UID" = 0 ]; then
-	clr[paren]=%B%F{blue}
-	clr[dark]=%F{white}
-	clr[lite]=%B%F{white}
-	clr[userhost]=%B%F{red}
+	clr[paren]=%{$reset_color%}%{$fg_bold[blue]%}
+	clr[dark]=%{$reset_color%}%{$fg[white]%}
+	clr[lite]=%{$reset_color%}%{$fg_bold[white]%}
+	clr[userhost]=%{$reset_color%}%{$fg_bold[red]%}
     else
 	clr[paren]="%F{cyan}"
 	clr[dark]="%B%F{black}"
