@@ -186,7 +186,10 @@ prompt_zork_setup()
 
     local show_date=1
     local show_clock=1
-    unset show_files show_dirs show_com show_tty show_commands
+    local show_tty=1
+    local show_commands=1
+    local show_files=1
+    local show_dirs=1
 
     typeset -A clr    
     if [ "$UID" = 0 ]; then
