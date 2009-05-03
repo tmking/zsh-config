@@ -21,10 +21,10 @@ set_colors()
 
     case $2 in 
 	BLACK|RED|GREEN|YELLOW|BLUE|MAGENTA|CYAN|WHITE)
-	    clr[$1]="%b%B%F{${(L)2}}"
+	    clr[$1]="%{$reset_color%}%{$fg_bold[${(L)2}]%}"
 	    ;;
 	black|red|green|yellow|blue|magenta|cyan|white)
-	    clr[$1]="%b%F{$2}"
+	    clr[$1]="%{$reset_color%}%{$fg[$2]%}"
 	    ;;
     esac
 }
@@ -105,17 +105,27 @@ git_func()
             psvar[2]=" git$lp$clr[lite]$branch$rp"
             ;;
         *"Untracked files"*)
-	    psvar[2]="git$lp%b%f%k%B%F{red}$branch$rp"
+	    psvar[2]="git$lp%{$reset_color%}%{$fg_bold[red]%}$branch$rp"
 	    ;;
 	*)
-            psvar[2]=" git$lp%b%f%k%F{red}$branch$rp"
+            psvar[2]=" git$lp%{$reset_color%}%{$fg[red]%}$branch$rp"
             ;;
+    esac
+}
+
+is_console()
+{
+    case $TERM in
+	xterm*|*rxvt*|Eterm*|cygwin*)
+	    return 1 ;;
+	*)
+	    return 0
     esac
 }
 
 prompt_zork_preexec()
 {
-    [ "$DISPLAY" ] || return
+    is_console || return
     titlebar_length=${TB_LENGTH:-$titlebar_length}
     case $1 in
         %*)
@@ -140,12 +150,14 @@ prompt_zork_precmd()
 	jobs=" [ $j+ ]"
 	psvar[1]=( " $j+" )
     fi
-    [ "$DISPLAY" ] && 
-    print -Pn "%{\e]0;[ $host ] [ %n ] [ %30<...<%2c%<< ] [ %h:%l ]$jobs\a%}"
+    is_console || print -Pn "%{\e]0;[ $host ] [ %n ] [ %30<...<%2c%<< ] [ %h:%l ]$jobs\a%}"
 }
 
 prompt_zork_setup()
 {
+    setopt promptsubst 
+    autoload -Uz colors
+    colors
     if ! setopt | grep -q promptsubst; then
 	echo "please put 'setopt promptsubst' into your .zshrc or this prompt won't work"
 	return 127
@@ -182,22 +194,22 @@ prompt_zork_setup()
 
     local lb="$clr[paren]["
     local rb="$clr[paren]]"
-    lp="%b$clr[paren]($clr[lite]"
-    rp="%b$clr[paren])"
-    local slash="%b$clr[paren]/$clr[lite]"
-    colon="%b$clr[paren]:$clr[lite]"
+    lp="$clr[paren]($clr[lite]"
+    rp="$clr[paren])"
+    local slash="$clr[paren]/$clr[lite]"
+    colon="%{$reset_color%}$clr[paren]:$clr[lite]"
     
     [ "$show_date" ] && local ps_date=" $clr[dark]$str_date$lp%D{%m}$slash%D{%d}$slash%D{%y}$rp"
     [ "$show_clock" ] && local ps_clock=" $clr[dark]$str_clock$lp%D{$hr}$colon%D{%M}$colon%D{%S}$rp"
     [ "$show_files" ] && local ps_file=" $clr[dark]$str_file$lp%5v$slash%6v$rp"
     [ "$show_dirs" ] && local ps_dir=" $clr[dark]$str_dir$lp%7v$slash%8v$rp"
     if [ "$show_tty" ]; then
-	if [ "$DISPLAY" ]; then
-	    local str_tty=$(echo $TTY | cut -d'/' -f3)
-	    local tty_num=$TTY:t
-	else
+	if is_console; then
 	    local str_tty=tty
 	    local tty_num=$TTY:t
+	else
+	    local str_tty=$(echo $TTY | cut -d'/' -f3)
+	    local tty_num=$TTY:t	    
 	fi
 	local ps_tty=" $clr[dark]$str_tty$lp$tty_num$rp"
     fi
@@ -205,7 +217,7 @@ prompt_zork_setup()
     
     local ps_userhost="$clr[userhost]%n$clr[paren]@$clr[userhost]$host%b"
 
-    local ps_wdir="$lp$clr[lite]%45<...<%~%<<$rp$clr[dark]"
+    local ps_wdir="$lp$clr[lite]%45<...<%~%<<$rp"
 
     local ps_line1="$lb$ps_date$ps_clock$ps_file$ps_dir$ps_tty$ps_com$clr[lite]%1v$clr[dark]"$'${psvar[2]}'" $rb"
     local ps_line2="$lb $ps_userhost$ps_wdir $rb"
@@ -217,8 +229,11 @@ ${ps_line2}
 ${ps_line3} "
     PS2=" $clr[userhost]%#$clr[dark] %_$clr[dark]-$clr[paren]>%b%f%k "
 
-    add-zsh-hook precmd prompt_zork_precmd
-    add-zsh-hook preexec prompt_zork_preexec
+    precmd() { prompt_zork_precmd }
+    preexec() { prompt_zork_preexec }
+
+    #add-zsh-hook precmd prompt_zork_precmd
+    #add-zsh-hook preexec prompt_zork_preexec
 }
 
 prompt_zork_setup "$@"

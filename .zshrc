@@ -21,7 +21,6 @@ fignore=(.o .c~ \~ .\~)
 autoload -Uz compinit promptinit run-help colors zrecompile
 compinit -i
 promptinit
-zrecompile
 zmodload -i zsh/stat
 
 ## start ssh keychain and source files
@@ -250,6 +249,7 @@ lsl() { lsFunc links $@ }
 
 reload() 
 {
+	echo HERE
     [ "$TERM" = xterm ] && print -Pn '%{\e]0;[ reloading... ]\a%}'
     unhash -a -f -m \*
     local tstamp=$(date +%S)
