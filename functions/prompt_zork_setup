@@ -209,7 +209,7 @@ prompt_zork_setup()
     local str_file=files
     local config=$ZDOTDIR/.promptrc
 
-    . $config
+    . $config >/dev/null 2>&1
     
     local p
     for p in paren dark lite userhost; do
