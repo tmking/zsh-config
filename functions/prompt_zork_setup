@@ -182,7 +182,7 @@ prompt_zork_setup()
 
     ## these variables can't be local because precmd() and 
     ## preexec() need them
-    titlebar_length=35
+    titlebar_length=50
     hr=%I
     host=%M
 
