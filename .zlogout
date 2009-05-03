@@ -1,5 +1,8 @@
 if [[ -o interactive ]]; then
-	if [ -z "$DISPLAY" ] || [ -z "$SSH_TTY" ]; then
+    case $TERM in
+	xterm*|*rxvt*|Eterm*|*cygwin*)
+	    : ;;
+	*)
 	    clear
-	fi
+    esac
 fi

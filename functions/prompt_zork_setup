@@ -79,10 +79,12 @@ prompt_zork_ls_count()
 
 prompt_zork_git_func()
 {
-    psvar[2]=""
+    psvar[2,9]=""
     [ -d "$PWD/.git" ] || return
 
     local branch=$(git branch | grep \* | cut -d' ' -f2)
+
+    psvar[9]=" [ git:$branch ]"
 
     case $(git --no-pager status) in
         *"nothing to commit"*)
@@ -109,7 +111,8 @@ prompt_zork_is_console()
 
 prompt_zork_preexec()
 {
-    prompt_zork_is_console || return
+    prompt_zork_is_console && return
+
     titlebar_length=${TB_LENGTH:-$titlebar_length}
     case $1 in
         %*)
@@ -135,7 +138,7 @@ prompt_zork_precmd()
 	psvar[1]=( " $j+" )
     fi
 
-    prompt_zork_is_console || print -Pn "%{\e]0;[ $host ] [ %n ] [ %30<...<%2c%<< ] [ %h:%l ]$jobs\a%}"
+    prompt_zork_is_console || print -Pn "%{\e]0;[ $host ] [ %n ] [ %30<...<%2c%<< ]%9v [ %h:%l ]$jobs\a%}"
 }
 
 prompt_zork_setup()
@@ -145,7 +148,7 @@ prompt_zork_setup()
 
     ## these variables can't be local because precmd() and 
     ## preexec() need them
-    titlebar_length=35
+    titlebar_length=50
     hr=%I
     host=%M
 
@@ -228,8 +231,8 @@ ${ps_line2}
 ${ps_line3} "
     PS2=" $clr[userhost]%#$clr[dark] %_$clr[dark]-$clr[paren]>%b%f%k "
 
-    precmd() { prompt_zork_precmd }
-    preexec() { prompt_zork_preexec }
+    precmd() { prompt_zork_precmd "$@" }
+    preexec() { prompt_zork_preexec "$@" }
 }
 
 prompt_zork_setup "$@"
