@@ -203,7 +203,7 @@ if [ "$UID" -ge 1000 ] && groups $USER | grep -q sudo; then
     ## this will modify root's .zshrc to capture our settings.
     ## this is good for carrying over the prompt.
     local rootzshrc=/root/.zsh/.zshrc
-    if ! grep -q "## automatically modified" $rootzshrc 2>/dev/null; then
+    if ! sudo grep -q "## automatically modified" $rootzshrc 2>/dev/null; then
 	local tmprc=$PWD/.zshrc.$RANDOM
 	print "modifying root .zshrc"
 	[ -f "$rootzshrc" ] && sudo mv -f $rootzshrc $rootzshrc.old
