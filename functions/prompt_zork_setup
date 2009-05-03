@@ -1,18 +1,39 @@
 prompt_zork_help()
 {
     cat <<EOF
-We accept the following arguments:
+We honor the following settings from the file $ZDOTDIR/.promptrc:
 
--p --paren [color] (color of parentheses)
--d --dark [color] (color of labels)
--l --lite [color] (color of variable data)
--u --userhost [color] (color of user/host string)
---24 (use 24 hour clock instead of 12 hour)
---com (show command number/job exit status)
---tty (show tty number)
---files (show count of regular/hidden files)
---dirs (show count of regular/hidden dirs)
---shorthost (show short hostname instead of fqdn)
+   ## the color of parentheses
+   color_paren=blue
+
+   ## the color of lables
+   color_dark=white
+
+   ## the color of variable data
+   color_lite=WHITE
+
+   ## the color of the user and host names
+   color_userhost=BLUE
+
+   ## the following should be left empty to disable features
+   ##
+   ## show a count of regular vs. hidden directories
+   show_dirs=yes
+
+   ## show a count of regular vs. hidden files
+   show_files=yes
+
+   ## show the number of the terminal device
+   show_tty=yes
+
+   ## show the command number/exit status of last command
+   show_commands=yes
+
+   ## use the short hostname instead of the fqdn
+   show_shorthost=yes
+
+   ## use military time
+   clock=24
 EOF
 }
 
@@ -165,7 +186,7 @@ prompt_zork_setup()
 
     local show_date=1
     local show_clock=1
-    unset show_files show_dirs show_com show_tty
+    unset show_files show_dirs show_com show_tty show_commands
 
     typeset -A clr    
     if [ "$UID" = 0 ]; then
@@ -207,10 +228,14 @@ prompt_zork_setup()
     local slash="%b$clr[paren]/$clr[lite]"
     colon="%b$clr[paren]:$clr[lite]"
     
-    [ "$show_date" ] && local ps_date=" $clr[dark]$str_date$lp%D{%m}$slash%D{%d}$slash%D{%y}$rp"
-    [ "$show_clock" ] && local ps_clock=" $clr[dark]$str_clock$lp%D{$hr}$colon%D{%M}$colon%D{%S}$rp"
-    [ "$show_files" ] && local ps_file=" $clr[dark]$str_file$lp%5v$slash%6v$rp"
-    [ "$show_dirs" ] && local ps_dir=" $clr[dark]$str_dir$lp%7v$slash%8v$rp"
+    [ "$show_date" ] && 
+    local ps_date=" $clr[dark]$str_date$lp%D{%m}$slash%D{%d}$slash%D{%y}$rp"
+    [ "$show_clock" ] && 
+    local ps_clock=" $clr[dark]$str_clock$lp%D{$hr}$colon%D{%M}$colon%D{%S}$rp"
+    [ "$show_files" ] && 
+    local ps_file=" $clr[dark]$str_file$lp%5v$slash%6v$rp"
+    [ "$show_dirs" ] && 
+    local ps_dir=" $clr[dark]$str_dir$lp%7v$slash%8v$rp"
     if [ "$show_tty" ]; then
 	if prompt_zork_is_console; then
 	    local str_tty=$(echo $TTY | cut -d'/' -f3)
@@ -221,7 +246,8 @@ prompt_zork_setup()
 	fi
 	local ps_tty=" $clr[dark]$str_tty$lp$tty_num$rp"
     fi
-    [ "$show_com" ] && local ps_com=" $clr[dark]$str_com$lp$clr[lite]%h$slash%?$rp"
+    [ "$show_commands" ] && 
+    local ps_com=" $clr[dark]$str_com$lp$clr[lite]%h$slash%?$rp"
     
     local ps_userhost="$clr[userhost]%n$clr[paren]@$clr[userhost]$host%b"
 
