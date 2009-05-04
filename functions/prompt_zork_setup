@@ -39,10 +39,7 @@ EOF
 
 prompt_zork_preview()
 {
-    for n in 1 2 3 4 5 6 7 8; do
-	psvar[$n]=""
-    done
-    
+    psvar[1,8]=""
     prompt_preview_theme zork "$@"
 }
 
@@ -60,9 +57,7 @@ prompt_zork_set_colors()
 
 prompt_zork_ls_count() 
 {
-    for n in 5 6 7 8; do
-	psvar[$n]=""
-    done
+    psvar[5,8]=""
 
     local -a f hf d hd
 
@@ -79,7 +74,8 @@ prompt_zork_ls_count()
 
 prompt_zork_git_func()
 {
-    psvar[2,9]=""
+    psvar[2]=""
+    psvar[9]=""
     [ -d "$PWD/.git" ] || return
 
     local branch=$(git branch | grep \* | cut -d' ' -f2)
