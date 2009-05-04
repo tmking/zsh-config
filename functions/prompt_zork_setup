@@ -74,20 +74,20 @@ prompt_zork_git_func()
 {
     [ -d "$PWD/.git" ] || return
 
-    local branch=$(git branch | grep \* | cut -d' ' -f2)
+    local branch=${$(git branch | grep \* | cut -d' ' -f2):-UNNAMED}
 
     psvar[9]=" [ git:$branch ]"
 
     case $(git --no-pager status) in
         *"nothing to commit"*)
-            psvar[2]=" git$lp$rs$clr[lite]$branch$rp"
+            psvar[2]=" git$lp$clr[lite]$branch$rp"
             ;;
-        *"Untracked files"*)
-	    psvar[2]=" git$lp$rs%{$fg_bold[red]%}$branch$rp"
+	*"not updated"*)
+            psvar[2]=" git$lp$clr[git_dirty]$branch$rp"
 	    ;;
-	*)
-            psvar[2]=" git$lp$rs%{$fg[red]%}$branch$rp"
-            ;;
+        *"Untracked files"*)
+	    psvar[2]="git$lp$clr[git_untracked]$branch$rp"
+	    ;;
     esac
 }
 
@@ -164,6 +164,9 @@ prompt_zork_setup()
 	clr[lite]=%{$reset_color$fg[white]%}
 	clr[userhost]=$clr[paren]
     fi
+
+    clr[git_untracked]="$fg[yellow]"
+    clr[git_dirty]="$fg_bold[red]"
 
     local str_clock=lc
     local str_date=d
