@@ -97,7 +97,9 @@ prompt_zork_parse_args()
 
 prompt_zork_ls_count() 
 {
-    psvar[5,6,7,8]=""
+    for n in 5 6 7 8; do
+        psvar[$n]=""
+    done
 
     local -a f hf d hd
 
@@ -131,7 +133,6 @@ prompt_zork_git_func()
         *"Untracked files"*)
 	    psvar[2]="git$lp$clr[git_untracked]$branch$rp"
 	    ;;
-
     esac
 }
 
@@ -172,6 +173,7 @@ prompt_zork_precmd()
 	jobs=" [ $j+ ]"
 	psvar[1]=( " $j+" )
     fi
+
     prompt_zork_is_console || print -Pn "%{\e]0;[ $host ] [ %n ] [ %30<...<%2c%<< ]%9v [ %h:%l ]$jobs\a%}"
 }
 
@@ -245,10 +247,10 @@ prompt_zork_setup()
     local ps_dir=" $clr[dark]$str_dir$lp%7v$slash%8v$rp"
     if [ "$show_tty" ]; then
 	if prompt_zork_is_console; then
-	    local str_tty=$(echo $TTY | cut -d'/' -f3)
+	    local str_tty=tty
 	    local tty_num=$TTY:t
 	else
-	    local str_tty=tty
+	    local str_tty=$(echo $TTY | cut -d'/' -f3)
 	    local tty_num=$TTY:t
 	fi
 	local ps_tty=" $clr[dark]$str_tty$lp$tty_num$rp"
