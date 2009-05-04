@@ -97,8 +97,6 @@ prompt_zork_parse_args()
 
 prompt_zork_ls_count() 
 {
-    psvar[5]=""
-    psvar[8]=""
     local -a f hf d hd
 
     f=( *(.N) )
@@ -114,7 +112,6 @@ prompt_zork_ls_count()
 
 prompt_zork_git_func()
 {
-    psvar[2,9]=""
     [ -d "$PWD/.git" ] || return
 
     local branch=${$(git branch | grep \* | cut -d' ' -f2):-UNNAMED}
@@ -161,12 +158,14 @@ prompt_zork_preexec()
 
 prompt_zork_precmd()
 {
+    unset psvar
+    
     prompt_zork_git_func
     prompt_zork_ls_count
  
     local jobs=
-    psvar[1]=""
     local j=${(Mw)#jobstates#suspended:}
+
     if [ $j -gt 0 ]; then
 	jobs=" [ $j+ ]"
 	psvar[1]=( " $j+" )
