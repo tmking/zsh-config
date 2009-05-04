@@ -57,8 +57,6 @@ prompt_zork_set_colors()
 
 prompt_zork_ls_count() 
 {
-    psvar[5,8]=""
-
     local -a f hf d hd
 
     f=( *(.N) )
@@ -74,8 +72,6 @@ prompt_zork_ls_count()
 
 prompt_zork_git_func()
 {
-    psvar[2]=""
-    psvar[9]=""
     [ -d "$PWD/.git" ] || return
 
     local branch=$(git branch | grep \* | cut -d' ' -f2)
@@ -123,6 +119,7 @@ prompt_zork_preexec()
 
 prompt_zork_precmd()
 {
+    unset psvar
     prompt_zork_git_func
     prompt_zork_ls_count
  
