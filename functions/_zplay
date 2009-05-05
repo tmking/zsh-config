@@ -1,4 +1,4 @@
-#compdef zplay
+#compdef zplay plnk
 
 local files args
 

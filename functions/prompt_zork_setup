@@ -180,27 +180,6 @@ prompt_zork_setup()
 {
     setopt promptsubst
 
-    ## these variables can't be local because 
-    ## precmd() and preexec() need them
-    titlebar_length=50
-    hr=%I
-    host=%M
-
-    local show_date=1
-    local show_clock=1
-    local show_tty=1
-    local show_commands=1
-    local show_files=1
-    local show_dirs=1
-
-    local lb="$clr[paren]["
-    local rb="$clr[paren]]"
-    local slash="%b$clr[paren]/$clr[lite]"
-    colon="%b$clr[paren]:$clr[lite]"
-    lp="%b$clr[paren]($clr[lite]"
-    rp="%b$clr[paren])"
-    rs="%b%f%k"
-
     typeset -Ag clr    
     if [ "$UID" = 0 ]; then
 	clr[paren]=%B%F{blue}
@@ -218,6 +197,19 @@ prompt_zork_setup()
     clr[git_dirty]="%B%F{red}"
     clr[git_commits]="%F{magenta}"
 
+    ## these variables can't be local because 
+    ## precmd() and preexec() need them
+    titlebar_length=50
+    hr=%I
+    host=%M
+
+    local show_date=1
+    local show_clock=1
+    local show_tty=1
+    local show_commands=1
+    local show_files=1
+    local show_dirs=1
+
     local str_clock=lc
     local str_date=d
     local str_com=com
@@ -226,8 +218,10 @@ prompt_zork_setup()
     local str_file=files
     local config=$ZDOTDIR/.promptrc
 
+    ## source user config
     . $config >/dev/null 2>&1
-    
+
+    ## set user colors
     local p
     for p in paren dark lite userhost; do
 	prompt_zork_set_colors $p $(eval echo $`eval echo color_\\$p`)
@@ -237,6 +231,15 @@ prompt_zork_setup()
 	#set_colors $p $arg
     done
 
+    rs="%b%f%k"
+    colon="$clr[paren]:$clr[lite]"
+    lp="$clr[paren]($clr[lite]$rs"
+    rp="$clr[paren])$rs"
+    local lb="$rs$clr[paren]["
+    local rb="$clr[paren]]$rs"
+    local slash="$rs$clr[paren]/$clr[lite]"
+
+    ## set user variables
     [ "$show_shorthost" ] && host=%m
     [ "$clock" = 24 ]  && hr=%H
 
@@ -261,7 +264,7 @@ prompt_zork_setup()
     [ "$show_commands" ] && 
     local ps_com=" $clr[dark]$str_com$lp$clr[lite]%h$slash%?$rp"
     
-    local ps_userhost="$clr[userhost]%n$clr[paren]@$clr[userhost]$host%b"
+    local ps_userhost="$clr[userhost]%n$clr[paren]@$clr[userhost]$host"
 
     local ps_wdir="$lp$clr[lite]%45<...<%~%<<$rp$clr[dark]"
 
