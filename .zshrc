@@ -1,13 +1,11 @@
 ## zshrc
 
-case $- in 
-	*i*)	: ;;
-	*)	return
-esac
-
 ## set paths (regular path is set in zshenv to 
 ## ensure it is used by non-interactive shells
 . $ZDOTDIR/.zshenv 2>/dev/null
+## source other files for compatibility
+. $ZDOTDIR/.aliasrc 2>/dev/null
+. $HOME/.aliasrc 2>/dev/null
 
 cdpath=( . ~/ )
 case $fpath[-1] in
@@ -37,10 +35,6 @@ if which keychain >/dev/null 2>&1; then
     [ -f "$ssh_file" ] && . $ssh_file
     [ -f "$gpg_file" ] && . $gpg_file
 fi
-
-## source other files for compatibility
-. $ZDOTDIR/.aliasrc 2>/dev/null
-. $HOME/.aliasrc 2>/dev/null
 
 ## load prompt. Note that promptsubst has to be set here or the
 ## git string will be gibberish
@@ -100,7 +94,13 @@ hosts=( `</etc/hosts| grep -v \#` )
 
 ## load personal functions
 for func in $ZDOTDIR/functions/*(N); do
-	autoload -Uz $func:t
+    case $func in
+	*.zwc*)
+	    : ;;
+	*)
+	    [ -e "$func.zwc" ] || zcompile -M $func
+    esac
+    autoload -Uz $func:t
 done
 compdef _hosts links yafc
 compdef _rsync rsync
