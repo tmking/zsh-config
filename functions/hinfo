@@ -1,0 +1,4 @@
+for arg in "$@"; do
+    echo "------$arg------"
+    echo "HEAD / HTTP/1.0\n" | nc "$arg" 80
+done

@@ -147,24 +147,26 @@ case $TERM in (xterm*|*rxvt*|Eterm*|*cygwin*)
 esac
 
 ## options
+setopt append_history
+setopt auto_cd
+setopt auto_pushd
+setopt auto_resume
+setopt cdable_vars
+setopt correct
+setopt extendedglob
 setopt hashlistall
 setopt hashdirs
-setopt nohashcmds
-setopt correct
-setopt append_history
-setopt share_history
-setopt nobeep
-setopt auto_cd
-setopt cdable_vars
-setopt pushd_ignore_dups
-setopt auto_pushd
-setopt nocheckjobs nohup
-setopt print_eight_bit
-setopt nofunction_argzero
-setopt auto_resume
 setopt hist_ignore_all_dups
 setopt hist_ignore_space
-setopt extendedglob
+setopt nobeep
+setopt nocheckjobs 
+setopt nohashcmds
+setopt nohup
+setopt print_eight_bit
+setopt pushd_ignore_dups
+setopt function_argzero
+setopt share_history
+
 
 ## aliases
 alias df='df -HT'
@@ -183,6 +185,7 @@ alias rm='nocorrect rm -i'
 ## Things to set up if I'm in the 'sudo' group
 if [ "$UID" -ge 1000 ] && groups $USER | grep -q sudo; then
     if [ -e /etc/debian_version ]; then
+	local b
 	for b in /usr/bin/{apt*(N),dpkg*(N),deb*(N)} /usr/sbin/dpkg*; do
 	    a=$b:t
 	    alias `eval echo \$a`="sudo $a"
@@ -218,168 +221,4 @@ if [ "$UID" -ge 1000 ] && groups $USER | grep -q sudo; then
 	sudo mv $tmprc $rootzshrc && rm -f $tmprc
     fi
 fi
-
-## functions
-lsExec()
-{
-    do=$1; shift
-    args=$@
-
-    case $do in
-	files)	ls $args *(.N)		;;
-	dirs)	ls -d $args *(-/N)	;;
-	links)	ls $args *(@N) .*(@N)		;;
-	hidden)	ls $args .*(.N)
-    esac
-}
-
-lsFunc()
-{
-    do=$1; shift
-    args=()
-    dirs=()
-    while [ "$*" ]; do
-	if [ -d "$1" ]; then
-	    dirs+=$1
-	else
-	    case $1 in -*)	args+=$1 esac
-	fi
-	shift
-    done
-
-    if [ -z "$dirs" ]; then
-	lsExec $do $args
-    else
-	for dir in $dirs; do
-	    ( cd $dir && print "\n$dir:"; lsExec $do $args )
-	done
-    fi
-
-    unset do args dirs
-}
-
-lsf() {	lsFunc files $@ }
-lsd() { lsFunc dirs $@ }
-lsa() { lsFunc hidden $@ }
-lsl() { lsFunc links $@ }
-
-reload() 
-{
-    [ "$TERM" = xterm ] && print -Pn '%{\e]0;[ reloading... ]\a%}'
-    unhash -a -f -m \*
-    local tstamp=$(date +%S)
-    . $ZDIR/zshenv 2>/dev/null
-    . $ZDIR/zshrc 2>/dev/null
-    . $ZDOTDIR/.zshenv 2>/dev/null
-    . $ZDOTDIR/.zshrc 2>/dev/null
-
-    zrecompile -p -- \
-	-R $ZDOTDIR/.zshrc -- \
-	-M $ZDOTDIR/.zcompdump -- \
-	-M $ZDOTDIR/functions/**/*.zwc(N)
-
-    for f in $ZDOTDIR/functions/**/*(.N); do
-	case $f in 
-	    *.zwc*) : ;;
-	    *)
-		unfunction $f:t && autoload -Uz $f:t
-	esac
-    done
-
-    precmd 2>/dev/null
-    local tstamp2=$(( $(date +%S) - $tstamp ))
-    print "config reloaded in $tstamp2 seconds"
-}
-
-showcfg() 
-{
-    getcfg_f() 
-    {
-	local yes
-	if [ -f $1 ]; then
-	    yes="(*)"
-	else
-	    yes="\e[1;30m( )"
-	fi
-	print "  $yes $1\e[0m"
-    }
-
-    global_confs=( zshenv zprofile zshrc zlogin zlogout zps1 )
-    local_confs=( .zshenv .zprofile .zshrc .zlogin .ps1 .hosts .history )
-
-    print "global:"
-    for c in $global_confs; do
-	getcfg_f $ZDIR/$c
-    done
-    getcfg_f /etc/aliasrc
-
-    print "\nlocal:"
-    for c in $local_confs; do
-	getcfg_f $ZDOTDIR/$c
-    done
-    
-    unset global_confs local_confs
-}
-
-hinfo() 
-{
-    for arg in "$@"; do
-	echo "------$arg------"
-	echo "HEAD / HTTP/1.0\n" | nc "$arg" 80
-    done
-}
-
-zrec() 
- {
-     zrecompile "$@" -p -- \
-         -R $ZDOTDIR/.zshrc -- \
-         -R $ZDOTDIR/.z*dump -- \
-         -R ~/lib/zsh/comp/Core/compinit -- \
-         -R ~/lib/zsh/comp/Core/compaudit -- \
-         -R ~/lib/zsh/comp/Core/compdump -- \
-         -M ~/lib/zsh/funcs.zwc \
-         ~/funcs/*(.) \
-         ~/lib/zsh/comp/*/_* \
-         ~/lib/zsh/func/*/*
-}
-
-rep() 
-{
-    case $1 in [a-zA-Z]*) return 3 ;; esac
-    local num=$1  && shift 1
-    local count=0 
-    while [ "$count" != "$num" ]
-    do
-        if eval $@
-	then
-            local count=$(( $count + 1 )) 
-	else	
-	    return 6
-	fi
-    done
-}
-
-note() 
-{
-    case $(tty) in
-	/dev/tty/*)	ed=nano ;;
-	*)		ed=mousepad
-    esac
-    ( cd ~/notes && $ed "$@" )
-}
-
-smartpager() 
-{
-    local cmd
-    cmd="$1"
-    shift 1
-    data=( "$(eval command $cmd $@ 2>&1 | tr '\\' ð)" )
-
-    if [ $(print $data | wc -l) -gt $(( $LINES - 5 )) ]; then
-	print -n $data | tr ð '\\' | $READNULLCMD
-    else
-	print $data | tr ð '\\'
-    fi
-}
-
 
