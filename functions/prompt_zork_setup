@@ -231,7 +231,9 @@ prompt_zork_setup()
     local p
     for p in paren dark lite userhost; do
 	prompt_zork_set_colors $p $(eval echo $`eval echo color_\\$p`)
-	#local arg=${!color_$p}
+	prompt_zork_set_colors $p $(eval echo $`eval echo clr_\\$p`)
+
+        #local arg=${!color_$p}
 	#set_colors $p $arg
     done
 
