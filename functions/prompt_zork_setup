@@ -128,6 +128,8 @@ prompt_zork_git_func()
         *"Untracked files"*)
 	    psvar[2]="git$lp$clr[git_untracked]$branch$rp"
 	    ;;
+	*"Changes to be committed"*)
+	    psvar[2]="git$lp$clr[git_commits]$branch$rp"
     esac
 }
 
@@ -191,6 +193,14 @@ prompt_zork_setup()
     local show_files=1
     local show_dirs=1
 
+    local lb="$clr[paren]["
+    local rb="$clr[paren]]"
+    local slash="%b$clr[paren]/$clr[lite]"
+    colon="%b$clr[paren]:$clr[lite]"
+    lp="%b$clr[paren]($clr[lite]"
+    rp="%b$clr[paren])"
+    rs="%b%f%k"
+
     typeset -Ag clr    
     if [ "$UID" = 0 ]; then
 	clr[paren]=%B%F{blue}
@@ -206,6 +216,7 @@ prompt_zork_setup()
 
     clr[git_untracked]="%F{yellow}"
     clr[git_dirty]="%B%F{red}"
+    clr[git_commits]="%F{magenta}"
 
     local str_clock=lc
     local str_date=d
@@ -227,13 +238,6 @@ prompt_zork_setup()
     [ "$show_shorthost" ] && host=%m
     [ "$clock" = 24 ]  && hr=%H
 
-    local lb="$clr[paren]["
-    local rb="$clr[paren]]"
-    lp="%b$clr[paren]($clr[lite]"
-    rp="%b$clr[paren])"
-    local slash="%b$clr[paren]/$clr[lite]"
-    colon="%b$clr[paren]:$clr[lite]"
-    
     [ "$show_date" ] && 
     local ps_date=" $clr[dark]$str_date$lp%D{%m}$slash%D{%d}$slash%D{%y}$rp"
     [ "$show_clock" ] && 
@@ -261,13 +265,13 @@ prompt_zork_setup()
 
     local ps_line1="$lb$ps_date$ps_clock$ps_file$ps_dir$ps_tty$ps_com$clr[lite]%1v$clr[dark]"$'${psvar[2]}'" $rb"
     local ps_line2="$lb $ps_userhost$ps_wdir $rb"
-    local ps_line3=" $clr[userhost]%#$clr[dark]-$clr[paren]>%b%f%k"
+    local ps_line3=" $clr[userhost]%#$clr[dark]-$clr[paren]>$rs"
 
     PS1="
 ${ps_line1}
 ${ps_line2}
 ${ps_line3} "
-    PS2=" $clr[userhost]%#$clr[dark] %_$clr[dark]-$clr[paren]>%b%f%k "
+    PS2=" $clr[userhost]%#$clr[dark] %_$clr[dark]-$clr[paren]>$rs "
 
     add-zsh-hook precmd prompt_zork_precmd
     add-zsh-hook preexec prompt_zork_preexec
