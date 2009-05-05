@@ -7,6 +7,8 @@ esac
 
 ## set paths (regular path is set in zshenv to 
 ## ensure it is used by non-interactive shells
+. $ZDOTDIR/.zshenv 2>/dev/null
+
 cdpath=( . ~/ )
 case $fpath[-1] in
     $ZDOTDIR/functions*)
@@ -42,8 +44,7 @@ fi
 
 ## load prompt. Note that promptsubst has to be set here or the
 ## git string will be gibberish
-setopt promptsubst
-prompt zork
+setopt promptsubst && prompt zork
 
 ## load color config for ls
 if [ -f /etc/DIR_COLORS ]; then
@@ -78,6 +79,7 @@ export WHOIS_HIDE=1
 export PAGER=less
 export EDITOR=nano
 export VISUAL=$EDITOR
+export GIT_PAGER=
 
 ## zsh variables
 NULLCMD=:
