@@ -1,0 +1,13 @@
+[ -d ~/notes ] || return
+
+local ed
+
+case $(tty) in
+    /dev/tty/*)
+	ed=nano
+	;;
+    *)
+	ed=mousepad
+esac
+
+( cd ~/notes && $ed "$@" )

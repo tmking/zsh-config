@@ -1,0 +1,9 @@
+local cmd="$1"
+shift 1
+data=( "$(eval command $cmd $@ 2>&1 | tr '\\' ð)" )
+
+if [ $(print $data | wc -l) -gt $(( $LINES - 5 )) ]; then
+    print -n $data | tr ð '\\' | $READNULLCMD
+else
+    print $data | tr ð '\\'
+fi
