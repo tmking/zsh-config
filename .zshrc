@@ -8,7 +8,6 @@
 . $ZDOTDIR/.aliasrc 2>/dev/null
 . $HOME/.aliasrc 2>/dev/null
 
-
 ## populate some arrays
 cdpath=( . ~/ )
 fignore=(.o .c~ \~ .\~)
@@ -41,25 +40,19 @@ unset myfunctions f
 compdef _x_color bsetroot
 compdef _tar star
 
-## start ssh keychain and source files
-local gpg_key ssh_file gpg_file
-if which gpg >/dev/null 2>&1; then
-    gpg_key=$(gpg --list-keys $USER 2>/dev/null| grep pub | cut -d'/' -f2 | cut -d' ' -f1)
-fi
-
-if which keychain >/dev/null 2>&1; then
-    keychain -q -Q id_rsa $_rc_gpg_key 2>/dev/null
-    ssh_file="$HOME/.keychain/$HOSTNAME-sh"
-    file="$HOME/.keychain/$HOSTNAME-sh-gpg"
-    [ -f "$ssh_file" ] && . $ssh_file
-    [ -f "$gpg_file" ] && . $gpg_file
-fi
-unset gpg_key ssh_file gpg_file
-
 ## load prompt. Note that promptsubst has to be set here or the
 ## git string will be gibberish
 setopt promptsubst 
 prompt zork
+
+## start ssh keychain and source files
+if which keychain >/dev/null 2>&1; then
+    if which gpg >/dev/null 2>&1; then
+	gpg_key=$(gpg --list-keys $USER 2>/dev/null| grep pub | cut -d'/' -f2 | cut -d' ' -f1)
+    fi
+    eval `keychain -q -Q --eval --nogui id_rsa $gpg_key`
+fi
+unset gpg_key
 
 ## load color config for ls
 if [ -f /etc/DIR_COLORS ]; then
@@ -121,7 +114,8 @@ zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*' list-colors "$LS_COLORS"
 zstyle ':completion::complete:*' use-cache on
 zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin \
-                 /usr/sbin /usr/bin /sbin /bin /usr/X11R6/bin
+    /usr/sbin /usr/bin /sbin /bin /usr/X11R6/bin \
+    /var/lib/gems/1.8/bin $HOME/bin
 zstyle ':completion:*:*:ogg123:*' file-patterns '*.(ogg|OGG):ogg\ files *(-/):directories'
 zstyle ':completion:*:*:mpg(123|321):*' file-patterns '*.(mp|MP)3:mp3\ files *(-/):directories'
 
@@ -135,11 +129,8 @@ bindkey '\e[5~' history-search-backward  #page up
 bindkey '\e[6~' history-search-forward   #page down
 bindkey '\e[1~' beginning-of-line
 bindkey '\e[4~' end-of-line
-# set home and end key in X terminals
-case $TERM in (xterm*|*rxvt*|Eterm*|*cygwin*)
-	bindkey '^[[7~' beginning-of-line
-	bindkey '^[[8~' end-of-line ;;
-esac
+bindkey '^[[7~' beginning-of-line
+bindkey '^[[8~' end-of-line 
 
 ## options
 setopt append_history
@@ -149,6 +140,7 @@ setopt auto_resume
 setopt cdable_vars
 setopt correct
 setopt extendedglob
+setopt function_argzero
 setopt hashlistall
 setopt hashdirs
 setopt hist_ignore_all_dups
@@ -159,9 +151,7 @@ setopt nohashcmds
 setopt nohup
 setopt print_eight_bit
 setopt pushd_ignore_dups
-setopt function_argzero
 setopt share_history
-
 
 ## aliases
 alias df='df -HT'
