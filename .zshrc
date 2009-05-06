@@ -44,11 +44,11 @@ compdef _tar star
 prompt zork
 
 ## start ssh keychain and source files
-if which keychain >/dev/null 2>&1; then
+if which keychain >/dev/null 2>&1 && [ "$UID" -ge 1000 ]; then
     if which gpg >/dev/null 2>&1; then
 	gpg_key=$(gpg --list-keys $USER 2>/dev/null| grep pub | cut -d'/' -f2 | cut -d' ' -f1)
     fi
-    eval `keychain -q -Q --eval --nogui id_rsa $gpg_key`
+    eval `keychain -q -Q --eval id_rsa $gpg_key`
 fi
 unset gpg_key
 
