@@ -178,7 +178,7 @@ prompt_zork_precmd()
 
 prompt_zork_setup()
 {
-    setopt promptsubst
+    prompt_opts=( bang cr subst percent )
 
     typeset -Ag clr    
     if [ "$UID" = 0 ]; then
