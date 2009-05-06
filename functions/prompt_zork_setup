@@ -220,7 +220,7 @@ prompt_zork_setup()
 
     ## source user config
     if [ -f "$config" ]; then
-	$config
+	. $config
 
         ## set user colors
 	local p=
