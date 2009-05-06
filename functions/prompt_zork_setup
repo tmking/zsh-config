@@ -37,6 +37,12 @@ We honor the following settings from the file $ZDOTDIR/.promptrc:
 EOF
 }
 
+prompt_zork_preview()
+{
+    psvar[2]=""
+    prompt_preview_theme zork nogit "$@"
+}
+
 prompt_zork_set_colors()
 {
 
@@ -178,6 +184,7 @@ prompt_zork_precmd()
 
 prompt_zork_setup()
 {
+    [ "$1" = "nogit" ] && psvar[2]=""
     prompt_opts=( bang cr subst percent )
 
     typeset -Ag clr    
