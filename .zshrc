@@ -25,7 +25,7 @@ hosts=( `</etc/hosts| grep -v \#` )
 	 `grep -w Host ~/.ssh/config | sed 's/=//g' | cut -d' ' -f2 | tr -d '*'`
 )
 
-## load some functions functions
+## load some global zsh functions
 autoload -Uz compinit promptinit run-help colors zrecompile
 compinit -i
 promptinit
@@ -38,8 +38,6 @@ for f in ${myfunctions%*.old}; do
 	autoload -Uz $f:t
 done
 unset myfunctions f
-
-compdef _hosts yafc
 compdef _x_color bsetroot
 compdef _tar star
 
@@ -116,7 +114,7 @@ zstyle ':completion:predict:*' completer _complete
 zstyle ':completion:*' menu select=20
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format $'\e[44m\e[1;37mCompleting %d\e[0m'
-zstyle ':completion:*:(ssh|scp|sftp|rsync|git):*' hosts $hosts
+zstyle ':completion:*:(ssh|scp|sftp|rsync|git|yafc|lftp):*' hosts $hosts
 zstyle ':completion:*:*:kill:*:jobs' list-colors 'no=01;31'
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*' list-colors "$LS_COLORS"

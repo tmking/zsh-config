@@ -277,6 +277,8 @@ ${ps_line1}
 ${ps_line2}
 ${ps_line3} "
     PS2=" $clr[userhost]%#$clr[dark] %_$clr[dark]-$clr[paren]>$rs "
+    PS3=
+    RPROMPT=
 
     add-zsh-hook precmd prompt_zork_precmd
     add-zsh-hook preexec prompt_zork_preexec
