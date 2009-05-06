@@ -188,8 +188,8 @@ prompt_zork_setup()
 	clr[userhost]=%B%F{red}
     else
 	clr[paren]=%F{cyan}
-	clr[dark]=%B%F{black}
-	clr[lite]=%F{white}
+	clr[dark]=%F{white}
+	clr[lite]=%B%F{white}
 	clr[userhost]=%B%F{cyan}
     fi
 
@@ -219,25 +219,24 @@ prompt_zork_setup()
     local config=$ZDOTDIR/.promptrc
 
     ## source user config
-    . $config >/dev/null 2>&1
+    if [ -f "$config" ]; then
+	$config
 
-    ## set user colors
-    local p
-    for p in paren dark lite userhost; do
-	prompt_zork_set_colors $p $(eval echo $`eval echo color_\\$p`)
-	prompt_zork_set_colors $p $(eval echo $`eval echo clr_\\$p`)
-
-        #local arg=${!color_$p}
-	#set_colors $p $arg
-    done
+        ## set user colors
+	local p=
+	for p in paren dark lite userhost; do
+	    prompt_zork_set_colors $p $(eval echo $`eval echo color_\\$p`)
+	    prompt_zork_set_colors $p $(eval echo $`eval echo clr_\\$p`)
+	done
+    fi
 
     rs="%b%f%k"
-    colon="$clr[paren]:$clr[lite]"
-    lp="$clr[paren]($clr[lite]$rs"
+    colon="$rs$clr[paren]:$rs$clr[lite]"
+    lp="$rs$clr[paren]($clr[lite]"
     rp="$clr[paren])$rs"
     local lb="$rs$clr[paren]["
     local rb="$clr[paren]]$rs"
-    local slash="$rs$clr[paren]/$clr[lite]"
+    local slash="$rs$clr[paren]/$rs$clr[lite]"
 
     ## set user variables
     [ "$show_shorthost" ] && host=%m
@@ -272,11 +271,11 @@ prompt_zork_setup()
     local ps_line2="$lb $ps_userhost$ps_wdir $rb"
     local ps_line3=" $clr[userhost]%#$clr[dark]-$clr[paren]>$rs"
 
-    PS1="
+    export PS1="
 ${ps_line1}
 ${ps_line2}
 ${ps_line3} "
-    PS2=" $clr[userhost]%#$clr[dark] %_$clr[dark]-$clr[paren]>$rs "
+    export PS2=" $clr[userhost]%#$clr[dark] %_$clr[dark]-$clr[paren]>$rs "
     PS3=
     RPROMPT=
 

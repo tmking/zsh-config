@@ -35,7 +35,7 @@ zmodload -i zsh/stat
 myfunctions=( $ZDOTDIR/functions/**/*(N) )
 for f in ${myfunctions%*.old}; do
 	[ -f "$f:r.zwc" ] || zcompile -M $f
-	autoload -Uz $f:t
+	autoload $f:t
 done
 unset myfunctions f
 compdef _x_color bsetroot
@@ -58,7 +58,8 @@ unset gpg_key ssh_file gpg_file
 
 ## load prompt. Note that promptsubst has to be set here or the
 ## git string will be gibberish
-setopt promptsubst && prompt zork
+setopt promptsubst 
+prompt zork
 
 ## load color config for ls
 if [ -f /etc/DIR_COLORS ]; then
