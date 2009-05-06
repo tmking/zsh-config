@@ -40,9 +40,7 @@ unset myfunctions f
 compdef _x_color bsetroot
 compdef _tar star
 
-## load prompt. Note that promptsubst has to be set here or the
-## git string will be gibberish
-setopt promptsubst 
+## load prompt. 
 prompt zork
 
 ## start ssh keychain and source files
