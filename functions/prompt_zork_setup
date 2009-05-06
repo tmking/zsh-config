@@ -1,5 +1,3 @@
-## 4.3.6 version
-
 prompt_zork_help()
 {
     cat <<EOF
@@ -39,22 +37,62 @@ We honor the following settings from the file $ZDOTDIR/.promptrc:
 EOF
 }
 
-prompt_zork_preview()
-{
-    psvar[1,8]=""
-    prompt_preview_theme zork "$@"
-}
-
 prompt_zork_set_colors()
 {
+
     case $2 in 
 	BLACK|RED|GREEN|YELLOW|BLUE|MAGENTA|CYAN|WHITE)
-	    clr[$1]="%{$reset_color%}%{$fg_bold[${(L)2}]%}"
+	    clr[$1]="%b%B%F{${(L)2}}"
 	    ;;
 	black|red|green|yellow|blue|magenta|cyan|white)
-	    clr[$1]="%{$reset_color%}%{$fg[$2]%}"
+	    clr[$1]="%b%F{$2}"
 	    ;;
     esac
+}
+
+prompt_zork_parse_args()
+{
+    while [ -n "$*" ]; do
+
+	case $1 in
+	    -p|--paren)
+		set_colors paren $2; shift
+		;;
+	    -d|--dark)
+		set_colors dark $2; shift
+		;;
+	    -l|--lite)
+		set_colors lite $2; shift
+		;;
+	    -u|--userhost)
+		set_colors userhost $2; shift
+		;;
+	    -24)
+		hr="%H"
+		;;
+	    --date)
+		show_date=yes
+		;;
+	    --clock)
+		show_clock=yes
+		;;
+	    --files)
+		show_files=yes
+		;;
+	    --dirs)
+		show_dirs=yes
+		;;
+	    --tty)
+		show_tty=yes
+		;;
+	    --com)
+		show_com=yes
+		;;
+	    --shorthost)
+		host="%m"
+	esac
+	shift
+    done
 }
 
 prompt_zork_ls_count() 
@@ -108,7 +146,6 @@ prompt_zork_is_console()
 prompt_zork_preexec()
 {
     prompt_zork_is_console && return
-
     titlebar_length=${TB_LENGTH:-$titlebar_length}
     case $1 in
         %*)
@@ -124,13 +161,14 @@ prompt_zork_preexec()
 prompt_zork_precmd()
 {
     unset psvar
+    
     prompt_zork_git_func
     prompt_zork_ls_count
  
     local jobs=
-     local j=${(Mw)#jobstates#suspended:}
- 
-   if [ $j -gt 0 ]; then
+    local j=${(Mw)#jobstates#suspended:}
+
+    if [ $j -gt 0 ]; then
 	jobs=" [ $j+ ]"
 	psvar[1]=( " $j+" )
     fi
@@ -140,45 +178,37 @@ prompt_zork_precmd()
 
 prompt_zork_setup()
 {
-    autoload -Uz colors
-    colors
+    setopt promptsubst
 
-    ## these variables can't be local because precmd() and 
-    ## preexec() need them
+    typeset -Ag clr    
+    if [ "$UID" = 0 ]; then
+	clr[paren]=%B%F{blue}
+	clr[dark]=%F{white}
+	clr[lite]=%B%F{white}
+	clr[userhost]=%B%F{red}
+    else
+	clr[paren]=%F{cyan}
+	clr[dark]=%F{white}
+	clr[lite]=%B%F{white}
+	clr[userhost]=%B%F{cyan}
+    fi
+
+    clr[git_untracked]="%F{yellow}"
+    clr[git_dirty]="%B%F{red}"
+    clr[git_commits]="%F{magenta}"
+
+    ## these variables can't be local because 
+    ## precmd() and preexec() need them
     titlebar_length=50
     hr=%I
     host=%M
 
     local show_date=1
     local show_clock=1
+    local show_tty=1
+    local show_commands=1
     local show_files=1
     local show_dirs=1
-    local show_commands=1
-    local show_tty=1
-    local lb="$rs$clr[paren]["
-    local rb="$clr[paren]]$rs"
-    local slash="$rs$clr[paren]/$clr[lite]"
-    colon="$rs$clr[paren]:$clr[lite]"
-    rs="%{$reset_color%}"
-    lp="$rs$clr[paren]($clr[lite]"
-    rp="$clr[paren])$rs"
-
-    typeset -Ag clr    
-    if [ "$UID" = 0 ]; then
-	clr[paren]=%{$fg_bold[blue]%}
-	clr[dark]=%{$fg[white]%}
-	clr[lite]=%{$fg_bold[white]%}
-	clr[userhost]=%{$fg_bold[red]%}
-    else
-	clr[paren]=%{$fg[cyan]%}
-	clr[dark]=%{$fg_bold[black]%}
-	clr[lite]=%{$fg[white]%}
-	clr[userhost]=$clr[paren]
-    fi
-
-    clr[git_untracked]="$fg[yellow]"
-    clr[git_dirty]="$fg_bold[red]"
-    clr[git_commits]="$fg[magenta]"
 
     local str_clock=lc
     local str_date=d
@@ -188,51 +218,69 @@ prompt_zork_setup()
     local str_file=files
     local config=$ZDOTDIR/.promptrc
 
-    . $config >/dev/null 2>&1
+    ## source user config
+    if [ -f "$config" ]; then
+	. $config
 
-    local p
-    for p in paren dark lite userhost; do
-	prompt_zork_set_colors $p $(eval echo $`eval echo color_\\$p`)
-	prompt_zork_set_colors $p $(eval echo $`eval echo clr_\\$p`)
-	#local arg=${!color_$p}
-	#set_colors $p $arg
-    done
+        ## set user colors
+	local p=
+	for p in paren dark lite userhost; do
+	    prompt_zork_set_colors $p $(eval echo $`eval echo color_\\$p`)
+	    prompt_zork_set_colors $p $(eval echo $`eval echo clr_\\$p`)
+	done
+    fi
 
+    rs="%b%f%k"
+    colon="$rs$clr[paren]:$rs$clr[lite]"
+    lp="$rs$clr[paren]($clr[lite]"
+    rp="$clr[paren])$rs"
+    local lb="$rs$clr[paren]["
+    local rb="$clr[paren]]$rs"
+    local slash="$rs$clr[paren]/$rs$clr[lite]"
+
+    ## set user variables
     [ "$show_shorthost" ] && host=%m
     [ "$clock" = 24 ]  && hr=%H
-    
-    [ "$show_date" ] && local ps_date=" $clr[dark]$str_date$lp%D{%m}$slash%D{%d}$slash%D{%y}$rp"
-    [ "$show_clock" ] && local ps_clock=" $clr[dark]$str_clock$lp%D{$hr}$colon%D{%M}$colon%D{%S}$rp"
-    [ "$show_files" ] && local ps_file=" $clr[dark]$str_file$lp%5v$slash%6v"
-    [ "$show_dirs" ] && local ps_dir=" $clr[dark]$str_dir$lp%7v$slash%8v$rp"
+
+    [ "$show_date" ] && 
+    local ps_date=" $clr[dark]$str_date$lp%D{%m}$slash%D{%d}$slash%D{%y}$rp"
+    [ "$show_clock" ] && 
+    local ps_clock=" $clr[dark]$str_clock$lp%D{$hr}$colon%D{%M}$colon%D{%S}$rp"
+    [ "$show_files" ] && 
+    local ps_file=" $clr[dark]$str_file$lp%5v$slash%6v$rp"
+    [ "$show_dirs" ] && 
+    local ps_dir=" $clr[dark]$str_dir$lp%7v$slash%8v$rp"
     if [ "$show_tty" ]; then
 	if prompt_zork_is_console; then
 	    local str_tty=tty
 	    local tty_num=$TTY:t
 	else
 	    local str_tty=$(echo $TTY | cut -d'/' -f3)
-	    local tty_num=$TTY:t	    
+	    local tty_num=$TTY:t
 	fi
-	local ps_tty=" $clr[dark]$str_tty$lp$tty_num$rp$rs"
+	local ps_tty=" $clr[dark]$str_tty$lp$tty_num$rp"
     fi
-    [ "$show_commands" ] && local ps_com=" $clr[dark]$str_com$lp$clr[lite]%h$slash%?$rp"
+    [ "$show_commands" ] && 
+    local ps_com=" $clr[dark]$str_com$lp$clr[lite]%h$slash%?$rp"
     
-    local ps_userhost="$clr[userhost]%n$clr[paren]@$clr[userhost]$host%b"
+    local ps_userhost="$clr[userhost]%n$clr[paren]@$clr[userhost]$host"
 
-    local ps_wdir="$lp$clr[lite]%45<...<%~%<<$rp"
+    local ps_wdir="$lp$clr[lite]%45<...<%~%<<$rp$clr[dark]"
 
-    local ps_line1="$lb$ps_date$ps_clock$ps_file$ps_dir$ps_tty$ps_com$clr[dark]"$'${psvar[2]}'"$clr[lite]%1v $rb"
+    local ps_line1="$lb$ps_date$ps_clock$ps_file$ps_dir$ps_tty$ps_com$clr[lite]%1v$clr[dark]"$'${psvar[2]}'" $rb"
     local ps_line2="$lb $ps_userhost$ps_wdir $rb"
-    local ps_line3=" $clr[userhost]%#$clr[dark]-$clr[paren]>"
+    local ps_line3=" $clr[userhost]%#$clr[dark]-$clr[paren]>$rs"
 
-    PS1="
+    export PS1="
 ${ps_line1}
 ${ps_line2}
-${ps_line3}%{$reset_color%} "
-    PS2=" $clr[userhost]%#$clr[dark] %_$clr[dark]-$clr[paren]>$rs "
+${ps_line3} "
+    export PS2=" $clr[userhost]%#$clr[dark] %_$clr[dark]-$clr[paren]>$rs "
+    PS3=
+    RPROMPT=
 
-    precmd() { prompt_zork_precmd "$@" }
-    preexec() { prompt_zork_preexec "$@" }
+    add-zsh-hook precmd prompt_zork_precmd
+    add-zsh-hook preexec prompt_zork_preexec
 }
 
 prompt_zork_setup "$@"

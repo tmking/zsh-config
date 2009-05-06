@@ -3,42 +3,63 @@
 ## set paths (regular path is set in zshenv to 
 ## ensure it is used by non-interactive shells
 . $ZDOTDIR/.zshenv 2>/dev/null
+
 ## source other files for compatibility
 . $ZDOTDIR/.aliasrc 2>/dev/null
 . $HOME/.aliasrc 2>/dev/null
 
+
+## populate some arrays
 cdpath=( . ~/ )
+fignore=(.o .c~ \~ .\~)
+
 case $fpath[-1] in
     $ZDOTDIR/functions*)
         : ;;
     *)
-	local -a old_fpath; old_fpath=( $fpath )
-	fpath=( $ZDOTDIR/**/*(/N) )
-	fpath+=( $old_fpath )
+	fpath=( $ZDOTDIR/**/*(/N) $fpath )
 esac
-fignore=(.o .c~ \~ .\~)
 
+hosts=( `</etc/hosts| grep -v \#` )
+[ -e $HOME/.ssh/config ] && hosts+=(
+	 `grep -w Host ~/.ssh/config | sed 's/=//g' | cut -d' ' -f2 | tr -d '*'`
+)
+
+## load some global zsh functions
 autoload -Uz compinit promptinit run-help colors zrecompile
 compinit -i
 promptinit
 zmodload -i zsh/stat
 
+## load personal functions
+myfunctions=( $ZDOTDIR/functions/**/*(N) )
+for f in ${myfunctions%*.old}; do
+	[ -f "$f:r.zwc" ] || zcompile -M $f
+	autoload $f:t
+done
+unset myfunctions f
+compdef _x_color bsetroot
+compdef _tar star
+
 ## start ssh keychain and source files
+local gpg_key ssh_file gpg_file
 if which gpg >/dev/null 2>&1; then
-    local gpg_key=$(gpg --list-keys $USER 2>/dev/null| grep pub | cut -d'/' -f2 | cut -d' ' -f1)
+    gpg_key=$(gpg --list-keys $USER 2>/dev/null| grep pub | cut -d'/' -f2 | cut -d' ' -f1)
 fi
 
 if which keychain >/dev/null 2>&1; then
-    keychain -q -Q id_rsa $gpg_key 2>/dev/null
-    local ssh_file="$HOME/.keychain/$HOSTNAME-sh"
-    local gpg_file="$HOME/.keychain/$HOSTNAME-sh-gpg"
+    keychain -q -Q id_rsa $_rc_gpg_key 2>/dev/null
+    ssh_file="$HOME/.keychain/$HOSTNAME-sh"
+    file="$HOME/.keychain/$HOSTNAME-sh-gpg"
     [ -f "$ssh_file" ] && . $ssh_file
     [ -f "$gpg_file" ] && . $gpg_file
 fi
+unset gpg_key ssh_file gpg_file
 
 ## load prompt. Note that promptsubst has to be set here or the
 ## git string will be gibberish
-setopt promptsubst && prompt zork
+setopt promptsubst 
+prompt zork
 
 ## load color config for ls
 if [ -f /etc/DIR_COLORS ]; then
@@ -86,32 +107,6 @@ HELPDIR=/usr/share/zsh/help
 DIRSTACKSIZE=20
 MAILCHECK=60
 
-## array for host completion
-hosts=( `</etc/hosts| grep -v \#` )
-[ -e $HOME/.ssh/config ] && hosts+=(
-	 `grep -w Host ~/.ssh/config | sed 's/=//g' | cut -d' ' -f2 | tr -d '*'`
-)
-
-## load personal functions
-for func in $ZDOTDIR/functions/*(N); do
-    case $func in
-	*.zwc*)
-	    : ;;
-	*)
-	    [ -e "$func.zwc" ] || zcompile -M $func
-    esac
-    autoload -Uz $func:t
-done
-compdef _hosts links yafc
-compdef _rsync rsync
-compdef _x_color bsetroot
-compdef _build build
-compdef _zplay zplay
-compdef _notes note
-compdef _tar star
-compdef _zplay plnk
-compdef _isync isync
-
 ## configure completion system
 zstyle ':completion:*' completer _complete _prefix
 zstyle ':completion::prefix-1:*' completer _complete
@@ -120,7 +115,7 @@ zstyle ':completion:predict:*' completer _complete
 zstyle ':completion:*' menu select=20
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format $'\e[44m\e[1;37mCompleting %d\e[0m'
-zstyle ':completion:*:(ssh|scp|sftp|rsync|git):*' hosts $hosts
+zstyle ':completion:*:(ssh|scp|sftp|rsync|git|yafc|lftp):*' hosts $hosts
 zstyle ':completion:*:*:kill:*:jobs' list-colors 'no=01;31'
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*' list-colors "$LS_COLORS"
@@ -185,10 +180,9 @@ alias rm='nocorrect rm -i'
 ## Things to set up if I'm in the 'sudo' group
 if [ "$UID" -ge 1000 ] && groups $USER | grep -q sudo; then
     if [ -e /etc/debian_version ]; then
-	local b
-	for b in /usr/bin/{apt*(N),dpkg*(N),deb*(N)} /usr/sbin/dpkg*; do
-	    a=$b:t
-	    alias `eval echo \$a`="sudo $a"
+	for binary in /usr/bin/{apt*(N),dpkg*(N),deb*(N)} /usr/sbin/dpkg*; do
+	    alias_name=$binary:t
+	    alias `eval echo \$alias_name`="sudo $alias_name"
 	done
 
 	alias apt=aptitude
@@ -205,11 +199,13 @@ if [ "$UID" -ge 1000 ] && groups $USER | grep -q sudo; then
     alias rmmod='sudo rmmod'
     alias iptables='sudo iptables'
 
+    unset binary alias_name
+
     ## this will modify root's .zshrc to capture our settings.
     ## this is good for carrying over the prompt.
-    local rootzshrc=/root/.zsh/.zshrc
+    rootzshrc=/root/.zsh/.zshrc
     if ! sudo grep -q "## automatically modified" $rootzshrc 2>/dev/null; then
-	local tmprc=$PWD/.zshrc.$RANDOM
+	tmprc=$PWD/.zshrc.$RANDOM
 	print "modifying root .zshrc"
 	[ -f "$rootzshrc" ] && sudo mv -f $rootzshrc $rootzshrc.old
 	echo "## automatically modified by $USER on $(date)" >$tmprc
@@ -220,5 +216,5 @@ if [ "$UID" -ge 1000 ] && groups $USER | grep -q sudo; then
 	echo "[ " '$PWD' " = $HOME ] && cd" >>$tmprc
 	sudo mv $tmprc $rootzshrc && rm -f $tmprc
     fi
+    unset tmprc rootzshrc
 fi
-
