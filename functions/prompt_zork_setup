@@ -75,7 +75,7 @@ prompt_zork_ls_count()
 
 prompt_zork_git_func()
 {
-    [ -d "$PWD/.git" ] || return
+    [ -x $(which git) ] && [ -d "$PWD/.git" ] || return
 
     local branch=${$(git branch | grep \* | cut -d' ' -f2):-UNNAMED}
 
@@ -89,10 +89,10 @@ prompt_zork_git_func()
             psvar[2]=" git$lp$clr[git_dirty]$branch$rp"
 	    ;;
         *"Untracked files"*)
-	    psvar[2]="git$lp$clr[git_untracked]$branch$rp"
+	    psvar[2]=" git$lp$clr[git_untracked]$branch$rp"
 	    ;;
 	*"Changes to be committed"*)
-	    psvar[2]="git$lp$clr[git_commits]$branch$rp"
+	    psvar[2]=" git$lp$clr[git_commits]$branch$rp"
     esac
 }
 
