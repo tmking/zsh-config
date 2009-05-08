@@ -1,0 +1,13 @@
+#compdef note
+
+local files args
+
+files=( ~/notes/**/* )
+
+case ${#words} in
+#    2)	_values "$words[1] arg:" $args ;;
+    *)  _values 'notes:' $files:t
+esac
+
+
+

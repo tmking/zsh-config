@@ -1,0 +1,19 @@
+#compdef isync
+
+local local_dirs remote_dirs args
+
+local_dirs=( /music/**/*(N/) )
+remote_dirs=( /mnt/camera/**/*(N/) )
+
+case ${#words} in
+    2)	
+    	case $words[2] in
+	    */*) _files ;;
+	    *)   _values "music directory:" $local_dirs $local_dirs	;;
+	esac
+	;;
+    3)  _values "remote directory:" $remote_dirs $remote_dirs
+esac
+
+
+

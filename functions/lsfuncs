@@ -1,0 +1,47 @@
+lsExec()
+{
+    local mode=$1; shift
+    local args="$@"
+    local ls="$(alias -L ls | tr  \' '\ ' | cut -d' ' -f3-)"
+
+    case $mode in
+	lsf)
+	    eval  $ls $args -- "*(.N)"
+	    ;;
+	lsd)
+	    eval $ls -d $args "*(-/N)" 
+	    ;;
+	lsl)
+	    eval $ls $args "*(@N)" ".*(@N)"
+	    ;;
+	lsa)
+	    eval $ls $args ".*(.N)"
+    esac
+}
+
+local mode=$0
+typeset -a args dirs
+
+while [ "$*" ]; do
+    if [ -d "$1" ]; then
+	dirs+=$1
+    else
+	case $1 in
+	    -*) print here and args
+		args+=$1
+	esac
+    fi
+
+    shift
+
+done
+
+if [ -z "$dirs" ]; then
+    lsExec $mode $args
+else
+    for dir in $dirs; do
+	( cd $dir && print "\n$dir:"
+	    lsExec $mode $args )
+    done
+fi
+
