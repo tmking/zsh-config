@@ -60,7 +60,7 @@ elif [ -f $HOME/.dir_colors ]; then
     eval `dircolors $HOME/.dir_colors -b`
 elif [ -f $ZDOTDIR/.dir_colors ]; then
     eval `dircolors $ZDOTDIR/.dir_colors`
-elif [ -x $(which dircolors 2>/dev/null) ]; then
+elif [ -x $(which dircolors) ]; then
     eval `dircolors`
 fi
 
@@ -112,9 +112,7 @@ zstyle ':completion:*:*:kill:*:jobs' list-colors 'no=01;31'
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*' list-colors "$LS_COLORS"
 zstyle ':completion::complete:*' use-cache on
-zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin \
-    /usr/sbin /usr/bin /sbin /bin /usr/X11R6/bin \
-    /var/lib/gems/1.8/bin $HOME/bin
+zstyle ':completion:*:sudo:*' "$path"
 zstyle ':completion:*:*:ogg123:*' file-patterns '*.(ogg|OGG):ogg\ files *(-/):directories'
 zstyle ':completion:*:*:mpg(123|321):*' file-patterns '*.(mp|MP)3:mp3\ files *(-/):directories'
 
