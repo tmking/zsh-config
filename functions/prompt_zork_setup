@@ -118,7 +118,7 @@ prompt_zork_ls_count()
 
 prompt_zork_git_func()
 {
-    [ -d "$PWD/.git" ] || return
+    [ -d "$PWD/.git" ] && [ -x "$(which git)" ] || return
 
     local branch=${$(git branch | grep \* | cut -d' ' -f2):-UNNAMED}
 

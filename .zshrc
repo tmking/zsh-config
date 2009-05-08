@@ -59,7 +59,7 @@ elif [ -f $HOME/.dir_colors ]; then
     eval `dircolors $HOME/.dir_colors -b`
 elif [ -f $ZDOTDIR/.dir_colors ]; then
     eval `dircolors $ZDOTDIR/.dir_colors`
-else
+elif [ -x $(which dircolors 2>/dev/null) ]; then
     eval `dircolors`
 fi
 
