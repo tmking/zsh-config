@@ -1,0 +1,12 @@
+.history*
+.zcompcache/
+.zcompdump
+.*.zwc*
+*.zwc*
+.promptrc
+TODO
+.#*
+.z*
+.alias*
+-functions/prompt_zork_setup
+functions/
