@@ -6,4 +6,7 @@
 .promptrc
 TODO
 .#*
+.z*
 .alias*
+-functions/prompt_zork_setup
+functions/
