@@ -1,3 +1,4 @@
+##
 ## zshrc
 
 ## set paths (regular path is set in zshenv to 
