@@ -26,8 +26,8 @@ while [ "$*" ]; do
     if [ -d "$1" ]; then
 	dirs+=$1
     else
-	case $ in
-	    -*)
+	case $1 in
+	    -*) print here and args
 		args+=$1
 	esac
     fi
