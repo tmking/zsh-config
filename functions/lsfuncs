@@ -27,7 +27,7 @@ while [ "$*" ]; do
 	dirs+=$1
     else
 	case $1 in
-	    -*) print here and args
+	    -*) 
 		args+=$1
 	esac
     fi
