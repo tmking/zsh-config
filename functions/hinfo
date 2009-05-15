@@ -1,5 +1,5 @@
 # get header information from a webserver
 for arg in "$@"; do
     echo "------$arg------"
-    echo "HEAD / HTTP/1.0\n" | nc "$arg" 80
+    curl -I http://$arg
 done
