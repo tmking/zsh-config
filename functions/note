@@ -2,12 +2,6 @@
 
 local ed
 
-case $(tty) in
-    /dev/tty/*)
-	ed=nano
-	;;
-    *)
-	ed=mousepad
-esac
+[ "$DISPLAY" ] && ed=mousepad || ed=nano
 
 ( cd ~/notes && $ed "$@" )
