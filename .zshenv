@@ -8,6 +8,7 @@ if [ $UID -ge 500 ] || [ $UID = 0 ]; then
 		/usr/local/bin /usr/bin /bin 
 		/usr/local/sbin /usr/sbin /sbin 
 		/usr/X11R6/bin /usr/games 
+		$HOME/.gem/ruby/1.8/bin
 	)
 	for d in /opt/local/bin /var/lib/gems/1.8/bin/ $HOME/bin ; do
 	    [ -d "$d" ] && path=( $d $path )
