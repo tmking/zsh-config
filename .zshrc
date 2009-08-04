@@ -43,7 +43,7 @@ compdef _tar star
 
 ## load prompt. 
 case $ZSH_VERSION in
-    4.3.6)
+    4.3.(6|4))
 	prompt zork_436 ;;
     *)
 	prompt zork
