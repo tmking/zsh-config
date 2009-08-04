@@ -1,6 +1,6 @@
 ### 4.3.6 prompt
 
-prompt_zork_help()
+prompt_zork_436_help()
 {
     cat <<EOF
 We honor the following settings from the file $ZDOTDIR/.promptrc:
@@ -39,14 +39,14 @@ We honor the following settings from the file $ZDOTDIR/.promptrc:
 EOF
 }
 
-prompt_zork_preview()
+prompt_zork_436_preview()
 {
     prompt_opts=( percent bang cr subst )
     psvar[1,8]=""
-    prompt_preview_theme zork "$@"
+    prompt_preview_theme zork_436 "$@"
 }
 
-prompt_zork_set_colors()
+prompt_zork_436_set_colors()
 {
     case $2 in 
 	BLACK|RED|GREEN|YELLOW|BLUE|MAGENTA|CYAN|WHITE)
@@ -58,7 +58,7 @@ prompt_zork_set_colors()
     esac
 }
 
-prompt_zork_ls_count() 
+prompt_zork_436_ls_count() 
 {
     local -a f hf d hd
 
@@ -73,7 +73,7 @@ prompt_zork_ls_count()
     psvar[8]=${#hd}
 }
 
-prompt_zork_git_func()
+prompt_zork_436_git_func()
 {
     [ -x $(which git) ] && [ -d "$PWD/.git" ] || return
 
@@ -96,7 +96,7 @@ prompt_zork_git_func()
     esac
 }
 
-prompt_zork_is_console()
+prompt_zork_436_is_console()
 {
     case $TERM in
 	xterm*|*rxvt*|Eterm*|cygwin*)
@@ -106,9 +106,9 @@ prompt_zork_is_console()
     esac
 }
 
-prompt_zork_preexec()
+prompt_zork_436_preexec()
 {
-    prompt_zork_is_console && return
+    prompt_zork_436_is_console && return
 
     titlebar_length=${TB_LENGTH:-$titlebar_length}
     case $1 in
@@ -122,11 +122,11 @@ prompt_zork_preexec()
     print -Pn "%{\e]0;[ $host ] [ %n ] [ %D{$hr}:%D{%M}: %$titlebar_length>...>% $cmd%>> ]\a%}"
 }
 
-prompt_zork_precmd()
+prompt_zork_436_precmd()
 {
     unset psvar
-    prompt_zork_git_func
-    prompt_zork_ls_count
+    prompt_zork_436_git_func
+    prompt_zork_436_ls_count
  
     local jobs=
      local j=${(Mw)#jobstates#suspended:}
@@ -136,10 +136,10 @@ prompt_zork_precmd()
 	psvar[1]=( " $j+" )
     fi
 
-    prompt_zork_is_console || print -Pn "%{\e]0;[ $host ] [ %n ] [ %30<...<%2c%<< ]%9v [ %h:%l ]$jobs\a%}"
+    prompt_zork_436_is_console || print -Pn "%{\e]0;[ $host ] [ %n ] [ %30<...<%2c%<< ]%9v [ %h:%l ]$jobs\a%}"
 }
 
-prompt_zork_setup()
+prompt_zork_436_setup()
 {
     autoload -Uz colors
     colors
@@ -189,8 +189,8 @@ prompt_zork_setup()
 
 	local p
 	for p in paren dark lite userhost; do
-	    prompt_zork_set_colors $p $(eval echo $`eval echo color_\\$p`)
-	    prompt_zork_set_colors $p $(eval echo $`eval echo clr_\\$p`)
+	    prompt_zork_436_set_colors $p $(eval echo $`eval echo color_\\$p`)
+	    prompt_zork_436_set_colors $p $(eval echo $`eval echo clr_\\$p`)
 	done
     fi
 
@@ -210,7 +210,7 @@ prompt_zork_setup()
     [ "$show_files" ] && local ps_file=" $clr[dark]$str_file$lp%5v$slash%6v"
     [ "$show_dirs" ] && local ps_dir=" $clr[dark]$str_dir$lp%7v$slash%8v$rp"
     if [ "$show_tty" ]; then
-	if prompt_zork_is_console; then
+	if prompt_zork_436_is_console; then
 	    local str_tty=tty
 	    local tty_num=$TTY:t
 	else
@@ -235,8 +235,8 @@ ${ps_line2}
 ${ps_line3}%{$reset_color%} "
     PS2=" $clr[userhost]%#$clr[dark] %_$clr[dark]-$clr[paren]>$rs "
 
-    precmd() { prompt_zork_precmd "$@" }
-    preexec() { prompt_zork_preexec "$@" }
+    precmd() { prompt_zork_436_precmd "$@" }
+    preexec() { prompt_zork_436_preexec "$@" }
 }
 
-prompt_zork_setup "$@"
+prompt_zork_436_setup "$@"
