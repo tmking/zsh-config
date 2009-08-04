@@ -195,18 +195,18 @@ if [ "$UID" -ge 1000 ] && groups $USER | grep -q sudo; then
 
     ## this will modify root's .zshrc to capture our settings.
     ## this is good for carrying over the prompt.
-    rootzshrc=/root/.zsh/.zshrc
-    if ! sudo grep -q "## automatically modified" $rootzshrc 2>/dev/null; then
-	tmprc=$PWD/.zshrc.$RANDOM
-	print "modifying root .zshrc"
-	[ -f "$rootzshrc" ] && sudo mv -f $rootzshrc $rootzshrc.old
-	echo "## automatically modified by $USER on $(date)" >$tmprc
-	echo "[ -d /usr/NX/bin ] && path+=( /usr/NX/bin )" >>$tmprc
-	[ -d "$HOME/bin" ] && echo "path+=( $HOME/bin )" >>$tmprc
-	echo "fpath+=( $ZDOTDIR/functions )" >>$tmprc
-	echo ". $ZDOTDIR/.zshrc">>$tmprc
-	echo "[ " '$PWD' " = $HOME ] && cd" >>$tmprc
-	sudo mv $tmprc $rootzshrc && rm -f $tmprc
-    fi
+#    rootzshrc=/root/.zsh/.zshrc
+#    if ! sudo grep -q "## automatically modified" $rootzshrc 2>/dev/null; then
+#	tmprc=$PWD/.zshrc.$RANDOM
+#	print "modifying root .zshrc"
+#	[ -f "$rootzshrc" ] && sudo mv -f $rootzshrc $rootzshrc.old
+#	echo "## automatically modified by $USER on $(date)" >$tmprc
+#	echo "[ -d /usr/NX/bin ] && path+=( /usr/NX/bin )" >>$tmprc
+#	[ -d "$HOME/bin" ] && echo "path+=( $HOME/bin )" >>$tmprc
+#	echo "fpath+=( $ZDOTDIR/functions )" >>$tmprc
+#	echo ". $ZDOTDIR/.zshrc">>$tmprc
+#	echo "[ " '$PWD' " = $HOME ] && cd" >>$tmprc
+#	sudo mv $tmprc $rootzshrc && rm -f $tmprc
+#    fi
     unset tmprc rootzshrc
 fi
