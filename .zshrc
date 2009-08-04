@@ -42,7 +42,12 @@ compdef _x_color bsetroot
 compdef _tar star
 
 ## load prompt. 
-prompt zork
+case $ZSH_VERSION in
+    4.3.6)
+	prompt zork_436 ;;
+    *)
+	prompt zork
+esac
 
 ## start ssh keychain and source files
 if which keychain >/dev/null 2>&1 && [ "$UID" -ge 1000 ]; then
