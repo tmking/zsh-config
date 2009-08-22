@@ -123,9 +123,11 @@ zstyle ':completion:*:*:mpg(123|321):*' file-patterns '*.(mp|MP)3:mp3\ files *(-
 
 ## key bindings
 bindkey "^[[3~" delete-char
-bindkey "^[^[[3~" delete-word
-bindkey '^[\e[D' backward-word
-bindkey '^[\e[C' forward-word
+bindkey "3~" delete-word
+bindkey '5D' backward-word
+bindkey '3D' backward-word
+bindkey '5C' forward-word
+bindkey '3C' forward-word
 bindkey '\e[2~' end-of-history           #insert
 bindkey '\e[5~' history-search-backward  #page up
 bindkey '\e[6~' history-search-forward   #page down

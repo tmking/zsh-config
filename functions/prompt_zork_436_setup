@@ -225,8 +225,8 @@ prompt_zork_436_setup()
 
     local ps_wdir="$lp$clr[lite]%45<...<%~%<<$rp"
 
-    local ps_line1="$lb$ps_date$ps_clock$ps_file$ps_dir$ps_tty$ps_com$clr[dark]"$'${psvar[2]}'"$clr[lite]%1v $rb"
-    local ps_line2="$lb $ps_userhost$ps_wdir $rb"
+    local ps_line1="$lb$ps_date$ps_clock$ps_file$ps_dir$ps_tty$ps_com $rb"
+    local ps_line2="$lb $ps_userhost$ps_wdir$clr[dark]"$'${psvar[2]}'"$clr[lite]%1v $rb"
     local ps_line3=" $clr[userhost]%#$clr[dark]-$clr[paren]>"
 
     PS1="
