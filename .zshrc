@@ -1,7 +1,7 @@
 ##
 ## zshrc
 
-## set paths (regular path is set in zshenv to 
+## set paths (regular path is set in zshenv to
 ## ensure it is used by non-interactive shells
 . $ZDOTDIR/.zshenv 2>/dev/null
 
@@ -11,7 +11,7 @@
 
 ## populate some arrays
 cdpath=( . ~/ )
-fignore=(.o .c~ \~ .\~)
+fignore=(.o .c~ \~ .\~ .DS_Store)
 
 case $fpath[-1] in
     $ZDOTDIR/functions*)
@@ -21,7 +21,7 @@ case $fpath[-1] in
 esac
 
 hosts=( `</etc/hosts| grep -v \#` )
-[ -e $HOME/.ssh/config ] && hosts+=(
+[ -e "$HOME/.ssh/config" ] && hosts+=(
 	 `grep -w Host ~/.ssh/config | sed 's/=//g' | cut -d' ' -f2 | tr -d '*'`
 )
 
@@ -37,11 +37,11 @@ for f in ${myfunctions%*.old}; do
 	[ -f "$f:r.zwc" ] || zcompile -M $f
 	autoload $f:t
 done
-unset myfunctions f
+unset myfunctions
 compdef _x_color bsetroot
 compdef _tar star
 
-## load prompt. 
+## load prompt.
 case $ZSH_VERSION in
     4.3.(6|4))
 	prompt zork_436 ;;
@@ -50,7 +50,7 @@ case $ZSH_VERSION in
 esac
 
 ## start ssh keychain and source files
-if which keychain >/dev/null 2>&1 && [ "$UID" -ge 1000 ]; then
+if which keychain >/dev/null 2>&1 && [ "$UID" -ge $base_uid ]; then
     if which gpg >/dev/null 2>&1; then
 	gpg_key=$(gpg --list-keys $USER 2>/dev/null| grep pub | cut -d'/' -f2 | cut -d' ' -f1)
     fi
@@ -65,7 +65,7 @@ elif [ -f $HOME/.dir_colors ]; then
     eval `dircolors $HOME/.dir_colors -b`
 elif [ -f $ZDOTDIR/.dir_colors ]; then
     eval `dircolors $ZDOTDIR/.dir_colors`
-elif [ -x $(which dircolors) ]; then
+elif [ -x "$(which dircolors)" ]; then
     eval `dircolors`
 fi
 
@@ -109,7 +109,7 @@ zstyle ':completion:*' completer _complete _prefix
 zstyle ':completion::prefix-1:*' completer _complete
 zstyle ':completion:incremental:*' completer _complete _correct
 zstyle ':completion:predict:*' completer _complete
-zstyle ':completion:*' menu select=20
+zstyle ':completion:*' menu select=zstyle
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format $'\e[44m\e[1;37mCompleting %d\e[0m'
 zstyle ':completion:*:(ssh|scp|sftp|rsync|git|yafc|lftp):*' hosts $hosts
@@ -129,12 +129,19 @@ bindkey '3D' backward-word
 bindkey '5C' forward-word
 bindkey '3C' forward-word
 bindkey '\e[2~' end-of-history           #insert
+
+# for OS X
+bindkey 'π' history-search-backward
+bindkey '˜' history-search-forward
+bindkey '\033[5D' backward-word
+bindkey '\033[5C' forward-word
+
 bindkey '\e[5~' history-search-backward  #page up
 bindkey '\e[6~' history-search-forward   #page down
 bindkey '\e[1~' beginning-of-line
 bindkey '\e[4~' end-of-line
 bindkey '^[[7~' beginning-of-line
-bindkey '^[[8~' end-of-line 
+bindkey '^[[8~' end-of-line
 
 ## options
 setopt append_history
@@ -150,7 +157,7 @@ setopt hashdirs
 setopt hist_ignore_all_dups
 setopt hist_ignore_space
 setopt nobeep
-setopt nocheckjobs 
+setopt nocheckjobs
 setopt nohashcmds
 setopt nohup
 setopt print_eight_bit
@@ -158,10 +165,11 @@ setopt pushd_ignore_dups
 setopt share_history
 
 ## aliases
+local ls_args="-AFhs --color=yes --show-control-chars -I .DS_Store -I .localized"
 alias df='df -HT'
-alias ls='ls -AFhs --color=yes --show-control-chars'
-alias ll='ls -AFhs --color=yes --show-control-chars -l'
-alias la='ls -AFhs --color=yes --show-control-chars -a'
+alias ls="ls $ls_args"
+alias ll="ls $ls_args -l"
+alias la="ls $ls_args -a"
 alias h='fc -l'
 alias d='dirs -v'
 alias gw='route -n | grep UG | cut -d" " -f10'
@@ -172,28 +180,32 @@ alias mkdir='nocorrect mkdir'
 alias rm='nocorrect rm -i'
 
 ## Things to set up if I'm in the 'sudo' group
-if [ "$UID" -ge 1000 ] && groups $USER | grep -q sudo; then
-    if [ -e /etc/debian_version ]; then
-	for binary in /usr/bin/{apt*(N),dpkg*(N),deb*(N)} /usr/sbin/dpkg*; do
-	    alias_name=$binary:t
-	    alias `eval echo \$alias_name`="sudo $alias_name"
-	done
+if [ "$UID" -ge $base_uid ]; then
+    if [ "$IS_OSX" ]; then
+	which gpgdir >/dev/null 2>&1 && alias gpgdir='gpgdir -u $HOME -a'
+	alias port='sudo port'
+    elif groups $USER | grep -q sudo; then
+	if [ -e /etc/debian_version ]; then
+	    for binary in /usr/bin/{apt*(N),dpkg*(N),deb*(N)} /usr/sbin/dpkg*; do
+		alias_name=$binary:t
+		alias `eval echo \$alias_name`="sudo $alias_name"
+	    done
 
-	alias apt=aptitude
-	alias uupdate='sudo uupdate'
-	alias m-a='sudo m-a'
-    fi
+	    alias apt=aptitude
+	    alias uupdate='sudo uupdate'
+	    alias m-a='sudo m-a'
+	fi
 
-    if [ -e /etc/gentoo-release ]; then
-	alias emerge='sudo emerge'
-	alias dispatch-conf='sudo dispatch-conf'
-    fi
+	if [ -e /etc/gentoo-release ]; then
+	    alias emerge='sudo emerge'
+	    alias dispatch-conf='sudo dispatch-conf'
+	fi
 
-    alias modprobe='sudo modprobe'
-    alias rmmod='sudo rmmod'
-    alias iptables='sudo iptables'
+	alias modprobe='sudo modprobe'
+	alias rmmod='sudo rmmod'
+	alias iptables='sudo iptables'
 
-    unset binary alias_name
+	unset binary alias_name
 
     ## this will modify root's .zshrc to capture our settings.
     ## this is good for carrying over the prompt.
@@ -210,5 +222,6 @@ if [ "$UID" -ge 1000 ] && groups $USER | grep -q sudo; then
 #	echo "[ " '$PWD' " = $HOME ] && cd" >>$tmprc
 #	sudo mv $tmprc $rootzshrc && rm -f $tmprc
 #    fi
-    unset tmprc rootzshrc
+	#unset tmprc rootzshrc
+    fi
 fi

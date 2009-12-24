@@ -210,12 +210,16 @@ prompt_zork_436_setup()
     [ "$show_files" ] && local ps_file=" $clr[dark]$str_file$lp%5v$slash%6v"
     [ "$show_dirs" ] && local ps_dir=" $clr[dark]$str_dir$lp%7v$slash%8v$rp"
     if [ "$show_tty" ]; then
-	if prompt_zork_436_is_console; then
+	if prompt_zork_is_console; then
 	    local str_tty=tty
 	    local tty_num=$TTY:t
+	elif [ "$IS_OSX" ]; then
+	    local str_tty=$(echo $TTY | cut -d'/' -f3 | cut -c-4)
+	    local tty_num=$(echo $TTY | cut -d'/' -f3 | cut -c5-)
 	else
+	   
 	    local str_tty=$(echo $TTY | cut -d'/' -f3)
-	    local tty_num=$TTY:t	    
+	    local tty_num=$TTY:t
 	fi
 	local ps_tty=" $clr[dark]$str_tty$lp$tty_num$rp$rs"
     fi

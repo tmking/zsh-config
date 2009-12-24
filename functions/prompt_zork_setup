@@ -261,7 +261,11 @@ prompt_zork_setup()
 	if prompt_zork_is_console; then
 	    local str_tty=tty
 	    local tty_num=$TTY:t
+	elif [ "$IS_OSX" ]; then
+	    local str_tty=$(echo $TTY | cut -d'/' -f3 | cut -c-4)
+	    local tty_num=$(echo $TTY | cut -d'/' -f3 | cut -c5-)
 	else
+	   
 	    local str_tty=$(echo $TTY | cut -d'/' -f3)
 	    local tty_num=$TTY:t
 	fi
