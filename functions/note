@@ -1,7 +1,7 @@
-[ -d ~/notes ] || return
+[ -d ~/Documents/notes ] || return
 
 local ed
 
 [ "$DISPLAY" ] && ed=mousepad || ed=nano
 
-( cd ~/notes && $ed "$@" )
+( cd ~/Documents/notes && $ed "$@" )

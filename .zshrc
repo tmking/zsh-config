@@ -7,22 +7,24 @@
 
 ## source other files for compatibility
 . $ZDOTDIR/.aliasrc 2>/dev/null
-. $HOME/.aliasrc 2>/dev/null
+#. $HOME/.aliasrc 2>/dev/null
+
+[ -x $HOME/.rvm/scripts/rvm ] && . $HOME/.rvm/scripts/rvm
 
 ## populate some arrays
 cdpath=( . ~/ )
 fignore=(.o .c~ \~ .\~ .DS_Store)
 
 case $fpath[-1] in
-    $ZDOTDIR/functions*)
-        : ;;
-    *)
-	fpath=( $ZDOTDIR/**/*(/N) $fpath )
+  $ZDOTDIR/functions*)
+  : ;;
+  *)
+  fpath=( $ZDOTDIR/**/*(/N) $fpath )
 esac
 
 hosts=( `</etc/hosts| grep -v \#` )
 [ -e "$HOME/.ssh/config" ] && hosts+=(
-	 `grep -w Host ~/.ssh/config | sed 's/=//g' | cut -d' ' -f2 | tr -d '*'`
+`grep -w Host ~/.ssh/config | sed 's/=//g' | cut -d' ' -f2 | tr -d '*'`
 )
 
 ## load some global zsh functions
@@ -34,8 +36,8 @@ zmodload -i zsh/stat
 ## load personal functions
 myfunctions=( $ZDOTDIR/functions/**/*(N) )
 for f in ${myfunctions%*.old}; do
-	[ -f "$f:r.zwc" ] || zcompile -M $f
-	autoload $f:t
+  [ -f "$f:r.zwc" ] || zcompile -M $f
+  autoload $f:t
 done
 unset myfunctions
 compdef _x_color bsetroot
@@ -43,30 +45,31 @@ compdef _tar star
 
 ## load prompt.
 case $ZSH_VERSION in
-    4.3.(6|4))
-	prompt zork_436 ;;
-    *)
-	prompt zork
+  4.3.(6|4))
+  prompt zork_436 ;;
+  *)
+  prompt zork
 esac
 
 ## start ssh keychain and source files
+export GPG_TTY=`tty`
 if which keychain >/dev/null 2>&1 && [ "$UID" -ge $base_uid ]; then
-    if which gpg >/dev/null 2>&1; then
-	gpg_key=$(gpg --list-keys $USER 2>/dev/null| grep pub | cut -d'/' -f2 | cut -d' ' -f1)
-    fi
-    eval `keychain -q -Q --eval id_rsa $gpg_key`
+  if which gpg >/dev/null 2>&1; then
+    gpg_key=$(gpg --list-keys $USER 2>/dev/null| grep pub | cut -d'/' -f2 | cut -d' ' -f1)
+  fi
+  eval `keychain -q -Q --eval id_rsa tmk_wat_github_rsa tmk_ygs_github_rsa $gpg_key`
 fi
 unset gpg_key
 
 ## load color config for ls
 if [ -f /etc/DIR_COLORS ]; then
-    eval `dircolors /etc/DIR_COLORS -b`
+  eval `dircolors /etc/DIR_COLORS -b`
 elif [ -f $HOME/.dir_colors ]; then
-    eval `dircolors $HOME/.dir_colors -b`
+  eval `dircolors $HOME/.dir_colors -b`
 elif [ -f $ZDOTDIR/.dir_colors ]; then
-    eval `dircolors $ZDOTDIR/.dir_colors`
+  eval `dircolors $ZDOTDIR/.dir_colors`
 elif [ -x "$(which dircolors)" ]; then
-    eval `dircolors`
+  eval `dircolors`
 fi
 
 ## limit core dumps
@@ -77,9 +80,9 @@ limit -s
 
 ## new file permissions
 if [ `id -gn` = `id -un` -a `id -u` -gt 14 ]; then
-	umask 002
+  umask 002
 else
-	umask 022
+  umask 022
 fi
 
 ## misc system variables
@@ -102,7 +105,7 @@ SAVEHIST=3000
 HISTFILE=$ZDOTDIR/.history
 HELPDIR=/usr/share/zsh/help
 DIRSTACKSIZE=20
-MAILCHECK=60
+MAILCHECK=100000000
 
 ## configure completion system
 zstyle ':completion:*' completer _complete _prefix
@@ -181,47 +184,32 @@ alias rm='nocorrect rm -i'
 
 ## Things to set up if I'm in the 'sudo' group
 if [ "$UID" -ge $base_uid ]; then
-    if [ "$IS_OSX" ]; then
-	which gpgdir >/dev/null 2>&1 && alias gpgdir='gpgdir -u $HOME -a'
-	alias port='sudo port'
-    elif groups $USER | grep -q sudo; then
-	if [ -e /etc/debian_version ]; then
-	    for binary in /usr/bin/{apt*(N),dpkg*(N),deb*(N)} /usr/sbin/dpkg*; do
-		alias_name=$binary:t
-		alias `eval echo \$alias_name`="sudo $alias_name"
-	    done
+  if [ "$IS_OSX" ]; then
+    which gpgdir >/dev/null 2>&1 && alias gpgdir='gpgdir -u $HOME -a'
+    alias port='sudo port'
+    alias launchctl='sudo launchctl'
 
-	    alias apt=aptitude
-	    alias uupdate='sudo uupdate'
-	    alias m-a='sudo m-a'
-	fi
+  elif groups $USER | grep -q sudo; then
+    if [ -e /etc/debian_version ]; then
+      for binary in /usr/bin/{apt*(N),dpkg*(N),deb*(N)} /usr/sbin/dpkg*; do
+        alias_name=$binary:t
+        alias `eval echo \$alias_name`="sudo $alias_name"
+      done
 
-	if [ -e /etc/gentoo-release ]; then
-	    alias emerge='sudo emerge'
-	    alias dispatch-conf='sudo dispatch-conf'
-	fi
-
-	alias modprobe='sudo modprobe'
-	alias rmmod='sudo rmmod'
-	alias iptables='sudo iptables'
-
-	unset binary alias_name
-
-    ## this will modify root's .zshrc to capture our settings.
-    ## this is good for carrying over the prompt.
-#    rootzshrc=/root/.zsh/.zshrc
-#    if ! sudo grep -q "## automatically modified" $rootzshrc 2>/dev/null; then
-#	tmprc=$PWD/.zshrc.$RANDOM
-#	print "modifying root .zshrc"
-#	[ -f "$rootzshrc" ] && sudo mv -f $rootzshrc $rootzshrc.old
-#	echo "## automatically modified by $USER on $(date)" >$tmprc
-#	echo "[ -d /usr/NX/bin ] && path+=( /usr/NX/bin )" >>$tmprc
-#	[ -d "$HOME/bin" ] && echo "path+=( $HOME/bin )" >>$tmprc
-#	echo "fpath+=( $ZDOTDIR/functions )" >>$tmprc
-#	echo ". $ZDOTDIR/.zshrc">>$tmprc
-#	echo "[ " '$PWD' " = $HOME ] && cd" >>$tmprc
-#	sudo mv $tmprc $rootzshrc && rm -f $tmprc
-#    fi
-	#unset tmprc rootzshrc
+      alias apt=aptitude
+      alias uupdate='sudo uupdate'
+      alias m-a='sudo m-a'
     fi
+
+    if [ -e /etc/gentoo-release ]; then
+      alias emerge='sudo emerge'
+      alias dispatch-conf='sudo dispatch-conf'
+    fi
+
+    alias modprobe='sudo modprobe'
+    alias rmmod='sudo rmmod'
+    alias iptables='sudo iptables'
+
+    unset binary alias_name
+  fi
 fi

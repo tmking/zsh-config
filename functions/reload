@@ -3,6 +3,8 @@
 unhash -a -f -m \*
 local tstamp=$(date +%S)
 
+unset rvm_loaded_flag
+
 . $ZDIR/zshenv 2>/dev/null
 . $ZDIR/zshrc 2>/dev/null
 . $ZDOTDIR/.zshenv 2>/dev/null
@@ -20,6 +22,8 @@ for f in $ZDOTDIR/functions/**/*(.N); do
 	    unfunction $f:t && autoload $f:t
     esac
 done
+
+[ -e "$PWD/.rvmrc" ] && . $PWD/.rvmrc
 
 precmd 2>/dev/null
 local tstamp=$(( $(date +%S) - $tstamp ))
