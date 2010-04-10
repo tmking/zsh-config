@@ -57,9 +57,12 @@ if which keychain >/dev/null 2>&1 && [ "$UID" -ge $base_uid ]; then
   if which gpg >/dev/null 2>&1; then
     gpg_key=$(gpg --list-keys $USER 2>/dev/null| grep pub | cut -d'/' -f2 | cut -d' ' -f1)
   fi
-  eval `keychain -q -Q --eval id_rsa tmk_wat_github_rsa tmk_ygs_github_rsa $gpg_key`
+  for key in id_rsa tmk_wat_github_rsa tmk_ygs_github_rsa; do
+    [ -f $HOME/.ssh/$key ] && keys+=$key
+  done
+  eval `keychain -q -Q --eval $keys $gpg_key`
 fi
-unset gpg_key
+unset gpg_key keys key
 
 ## load color config for ls
 if [ -f /etc/DIR_COLORS ]; then
