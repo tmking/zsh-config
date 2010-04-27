@@ -48,7 +48,7 @@ prompt_zork_436_preview()
 
 prompt_zork_436_set_colors()
 {
-    case $2 in 
+    case $2 in
 	BLACK|RED|GREEN|YELLOW|BLUE|MAGENTA|CYAN|WHITE)
 	    clr[$1]="%{$reset_color%}%{$fg_bold[${(L)2}]%}"
 	    ;;
@@ -58,7 +58,7 @@ prompt_zork_436_set_colors()
     esac
 }
 
-prompt_zork_436_ls_count() 
+prompt_zork_436_ls_count()
 {
     local -a f hf d hd
 
@@ -106,16 +106,22 @@ prompt_zork_436_is_console()
     esac
 }
 
+prompt_zork_436_rvm_func()
+{
+  ([ ${rvm_gemset_name+1} ] && [ ! -e "$PWD/.rvmrc" ]) && rvm default
+}
+
 prompt_zork_436_preexec()
 {
     prompt_zork_436_is_console && return
+    prompt_zork_436_rvm_func
 
     titlebar_length=${TB_LENGTH:-$titlebar_length}
     case $1 in
         %*)
 	    cmd=%%$1:gs/%//
 	    ;;
-        *)      
+        *)
 	    cmd="$(echo $1 | tr \\n " ")"
     esac
 
@@ -127,10 +133,10 @@ prompt_zork_436_precmd()
     unset psvar
     prompt_zork_436_git_func
     prompt_zork_436_ls_count
- 
+
     local jobs=
      local j=${(Mw)#jobstates#suspended:}
- 
+
    if [ $j -gt 0 ]; then
 	jobs=" [ $j+ ]"
 	psvar[1]=( " $j+" )
@@ -146,7 +152,7 @@ prompt_zork_436_setup()
 
     prompt_opts=( bang cr subst percent )
 
-    ## these variables can't be local because precmd() and 
+    ## these variables can't be local because precmd() and
     ## preexec() need them
     titlebar_length=50
     hr=%I
@@ -159,7 +165,7 @@ prompt_zork_436_setup()
     local show_commands=1
     local show_tty=1
 
-    typeset -Ag clr    
+    typeset -Ag clr
     if [ "$UID" = 0 ]; then
 	clr[paren]=%{$fg_bold[blue]%}
 	clr[dark]=%{$fg[white]%}
@@ -204,7 +210,7 @@ prompt_zork_436_setup()
 
     [ "$show_shorthost" ] && host=%m
     [ "$clock" = 24 ]  && hr=%H
-    
+
     [ "$show_date" ] && local ps_date=" $clr[dark]$str_date$lp%D{%m}$slash%D{%d}$slash%D{%y}$rp"
     [ "$show_clock" ] && local ps_clock=" $clr[dark]$str_clock$lp%D{$hr}$colon%D{%M}$colon%D{%S}$rp"
     [ "$show_files" ] && local ps_file=" $clr[dark]$str_file$lp%5v$slash%6v"
@@ -217,14 +223,14 @@ prompt_zork_436_setup()
 	    local str_tty=$(echo $TTY | cut -d'/' -f3 | cut -c-4)
 	    local tty_num=$(echo $TTY | cut -d'/' -f3 | cut -c5-)
 	else
-	   
+
 	    local str_tty=$(echo $TTY | cut -d'/' -f3)
 	    local tty_num=$TTY:t
 	fi
 	local ps_tty=" $clr[dark]$str_tty$lp$tty_num$rp$rs"
     fi
     [ "$show_commands" ] && local ps_com=" $clr[dark]$str_com$lp$clr[lite]%h$slash%?$rp"
-    
+
     local ps_userhost="$clr[userhost]%n$clr[paren]@$clr[userhost]$host%b"
 
     local ps_wdir="$lp$clr[lite]%45<...<%~%<<$rp"

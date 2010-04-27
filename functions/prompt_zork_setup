@@ -151,9 +151,15 @@ prompt_zork_is_console()
   esac
 }
 
+prompt_zork_rvm_func()
+{
+  ([ ${rvm_gemset_name+1} ] && [ ! -e "$PWD/.rvmrc" ]) && rvm default
+}
+
 prompt_zork_preexec()
 {
   prompt_zork_is_console && return
+  prompt_zork_rvm_func
   titlebar_length=${TB_LENGTH:-$titlebar_length}
   case $1 in
     %*)
