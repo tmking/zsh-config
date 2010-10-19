@@ -53,12 +53,11 @@ esac
 
 ## start ssh keychain and source files
 export GPG_TTY=`tty`
-ssh-add -D
 if which keychain >/dev/null 2>&1 && [ "$UID" -ge $base_uid ]; then
   if which gpg >/dev/null 2>&1; then
     gpg_key=$(gpg --list-keys $USER 2>/dev/null| grep pub | cut -d'/' -f2 | cut -d' ' -f1)
   fi
-  for key in "id_rsa tmk_wat_github_rsa tmk_ygs_github_rsa"; do
+  for key in "id_rsa tmk_wat_github_rsa tmk_ygs_github_rsa id_rsa_ygs_demo"; do
     [ -f $HOME/.ssh/$key ] && keys+="$key "
   done
   eval `keychain -q -Q --eval $keys $gpg_key`
@@ -172,7 +171,7 @@ setopt pushd_ignore_dups
 setopt share_history
 
 ## aliases
-local ls_args="-AFhs --color=yes --show-control-chars -I .DS_Store -I .localized"
+local ls_args="-AFhs --color=yes --show-control-chars -I .DS_Store -I .localized -I Icon?"
 alias df='df -HT'
 alias ls="ls $ls_args"
 alias ll="ls $ls_args -l"
@@ -185,6 +184,7 @@ alias mv='nocorrect mv -i'
 alias cp='nocorrect cp -i'
 alias mkdir='nocorrect mkdir'
 alias rm='nocorrect rm -i'
+alias ptouch='touch tmp/restart.txt'
 
 ## Things to set up if I'm in the 'sudo' group
 if [ "$UID" -ge $base_uid ]; then
