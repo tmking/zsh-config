@@ -11,15 +11,26 @@ local base_uid=500
 [ "$(uname)" = 'Darwin' ] && export IS_OSX=yes
 
 if [ $UID -ge $base_uid ] || [ $UID = 0 ]; then
+  other_path_dirs=(
+    /opt/local/bin
+    /opt/local/sbin
+    /opt/homebrew/bin
+    /opt/homebrew/sbin
+    /var/lib/gems/1.8/bin/
+    $HOME/bin
+  )
+  
   path=(
     /usr/local/bin /usr/bin /bin
     /usr/local/sbin /usr/sbin /sbin
     /usr/X11R6/bin /usr/games
     $HOME/.gem/ruby/1.8/bin
   )
-  for d in /opt/local/bin /opt/local/sbin /var/lib/gems/1.8/bin/ $HOME/bin ; do
+  for d in $other_path_dirs; do
     [ -d "$d" ] && path=( $d $path )
   done
+
+  unset other_path_dirs
 else
   path=( /usr/local/bin /usr/bin /bin /usr/games )
 fi
