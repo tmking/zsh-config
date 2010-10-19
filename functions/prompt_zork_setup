@@ -153,7 +153,12 @@ prompt_zork_is_console()
 
 prompt_zork_rvm_func()
 {
-  ([ ${rvm_gemset_name+1} ] && [ ! -e "$PWD/.rvmrc" ]) && rvm default
+  if ([ ${rvm_gemset_name+1} ] && [ ! -e "$PWD/.rvmrc" ]); then
+    case $PWD in
+        $OLDPWD*) : ;;
+        *) rvm default
+    esac
+  fi
 }
 
 prompt_zork_preexec()
