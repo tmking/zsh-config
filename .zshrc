@@ -171,9 +171,9 @@ setopt pushd_ignore_dups
 setopt share_history
 
 ## aliases
-local ls_args="-AFhs --color=yes --show-control-chars -I .DS_Store -I .localized -I Icon?"
+local ls_args="-AFhs --color=yes --show-control-chars -I .DS_Store -I .localized"
 alias df='df -HT'
-alias ls="ls $ls_args"
+alias ls="ls $ls_args --ignore='Icon*'"
 alias ll="ls $ls_args -l"
 alias la="ls $ls_args -a"
 alias h='fc -l'
