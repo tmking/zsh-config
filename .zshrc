@@ -97,7 +97,6 @@ export WHOIS_HIDE=1
 export PAGER=less
 export EDITOR=nano
 export VISUAL=$EDITOR
-export GIT_PAGER=
 
 ## zsh variables
 NULLCMD=:
