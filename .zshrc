@@ -202,6 +202,7 @@ if [ "$UID" -ge $base_uid ]; then
       alias apt=aptitude
       alias uupdate='sudo uupdate'
       alias m-a='sudo m-a'
+      alias service='sudo service'
     fi
 
     if [ -e /etc/gentoo-release ]; then
