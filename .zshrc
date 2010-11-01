@@ -36,6 +36,7 @@ zmodload -i zsh/stat
 ## load personal functions
 myfunctions=( $ZDOTDIR/functions/**/*(N) )
 for f in ${myfunctions%*.old}; do
+  echo doing $f
   [ -f "$f:r.zwc" ] || zcompile -M $f
   autoload $f:t
 done
@@ -184,6 +185,8 @@ alias cp='nocorrect cp -i'
 alias mkdir='nocorrect mkdir'
 alias rm='nocorrect rm -i'
 alias ptouch='touch tmp/restart.txt'
+alias nano='vim'
+which parallel >/dev/null 2>&1 && alias rake='parallel -u rake :::'
 
 ## Things to set up if I'm in the 'sudo' group
 if [ "$UID" -ge $base_uid ]; then
