@@ -1,0 +1,8 @@
+#compdef ss
+
+case $state in
+  *) _values 'projects:' $(ss --list)
+esac
+
+
+
