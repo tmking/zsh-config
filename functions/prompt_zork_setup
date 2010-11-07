@@ -45,7 +45,7 @@ prompt_zork_preview()
 
 prompt_zork_set_colors()
 {
-  case $2 in 
+  case $2 in
     BLACK|RED|GREEN|YELLOW|BLUE|MAGENTA|CYAN|WHITE)
     clr[$1]="%b%B%F{${(L)2}}"
     ;;
@@ -99,7 +99,7 @@ prompt_zork_parse_args()
   done
 }
 
-prompt_zork_ls_count() 
+prompt_zork_ls_count()
 {
   if [ -n "$show_files" ]; then
     local -a f hf
@@ -170,7 +170,7 @@ prompt_zork_preexec()
     %*)
     cmd=%%$1:gs/%//
     ;;
-    *)      
+    *)
     cmd="$(echo $1 | tr \\n " ")"
   esac
 
@@ -200,7 +200,7 @@ prompt_zork_setup()
   [ "$1" = "nogit" ] && psvar[2]=""
   prompt_opts=( bang cr subst percent )
 
-  typeset -Ag clr    
+  typeset -Ag clr
   if [ "$UID" = 0 ]; then
     clr[paren]=%B%F{blue}
     clr[dark]=%F{white}
@@ -217,7 +217,7 @@ prompt_zork_setup()
   clr[git_dirty]="%B%F{red}"
   clr[git_commits]="%F{magenta}"
 
-  ## these variables can't be local because 
+  ## these variables can't be local because
   ## precmd() and preexec() need them
   titlebar_length=50
   hr=%I
@@ -227,8 +227,8 @@ prompt_zork_setup()
   local show_clock=1
   local show_tty=1
   local show_commands=1
-  local show_files=1
-  local show_dirs=1
+  local show_files=
+  local show_dirs=
 
   local str_clock=lc
   local str_date=d
@@ -262,13 +262,13 @@ prompt_zork_setup()
   [ "$show_shorthost" ] && host=%m
   [ "$clock" = 24 ]  && hr=%H
 
-  [ "$show_date" ] && 
+  [ "$show_date" ] &&
   local ps_date=" $clr[dark]$str_date$lp%D{%m}$slash%D{%d}$slash%D{%y}$rp"
-  [ "$show_clock" ] && 
+  [ "$show_clock" ] &&
   local ps_clock=" $clr[dark]$str_clock$lp%D{$hr}$colon%D{%M}$colon%D{%S}$rp"
   [ "$show_files" ] &&
   local ps_file=" $clr[dark]$str_file$lp%5v$slash%6v$rp"
-  [ "$show_dirs" ] && 
+  [ "$show_dirs" ] &&
   local ps_dir=" $clr[dark]$str_dir$lp%7v$slash%8v$rp"
   if [ "$show_tty" ]; then
     if prompt_zork_is_console; then
@@ -284,7 +284,7 @@ prompt_zork_setup()
     fi
     local ps_tty=" $clr[dark]$str_tty$lp$tty_num$rp"
   fi
-  [ "$show_commands" ] && 
+  [ "$show_commands" ] &&
   local ps_com=" $clr[dark]$str_com$lp$clr[lite]%h$slash%?$rp"
 
   local ps_userhost="$clr[userhost]%n$clr[paren]@$clr[userhost]$host"
