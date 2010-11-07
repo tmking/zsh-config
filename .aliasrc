@@ -1,0 +1,47 @@
+if functions smartpager >/dev/null 2>&1; then
+  alias whois='smartpager whois'
+  alias smbclient='smartpager smbclient'
+fi
+
+alias mpg123='mpg123 -v'
+alias vpnc='sudo vpnc'
+alias rsync='rsync -P -t'
+alias rdiff-backup='sudo rdiff-backup'
+alias unrar='unrar e -kb -o+'
+alias nslookup='nslookup -sil'
+alias htop='sudo htop'
+alias dict='dict -c /opt/homebrew/etc/dict.conf'
+alias nano='vim'
+alias grep='grep --color'
+
+alias spec='spec -c -f specdoc'
+alias ptouch='touch tmp/restart.txt'
+alias sc='./script/console'
+
+if ls --version | grep -q GNU; then
+  ls_args="-AFhs --color=yes --show-control-chars -I .DS_Store -I .localized"
+  alias df='df -HT'
+  alias ls="ls $ls_args --ignore='Icon*'"
+  alias ll="ls $ls_args -l"
+  alias la="ls $ls_args -a"
+  unset ls_args
+else
+  alias ll='ls -l'
+  alias la='ls -a'
+fi
+
+alias h='fc -l'
+alias d='dirs -v'
+
+if [ -n "$ZSH_VERSION" ]; then
+  alias mv='nocorrect mv -i'
+  alias cp='nocorrect cp -i'
+  alias mkdir='nocorrect mkdir'
+  alias rm='nocorrect rm -i'
+else
+  alias mv='mv -i'
+  alias cp='cp -i'
+  alias rm='rm -i'
+fi
+
+which parallel >/dev/null 2>&1 && alias rake='parallel -u rake :::'
