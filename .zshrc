@@ -169,25 +169,6 @@ setopt print_eight_bit
 setopt pushd_ignore_dups
 setopt share_history
 
-## aliases
-local ls_args="-AFhs --color=yes --show-control-chars -I .DS_Store -I .localized"
-alias df='df -HT'
-alias ls="ls $ls_args --ignore='Icon*'"
-alias ll="ls $ls_args -l"
-alias la="ls $ls_args -a"
-alias h='fc -l'
-alias d='dirs -v'
-alias gw='route -n | grep UG | cut -d" " -f10'
-alias grep='grep --color'
-alias mv='nocorrect mv -i'
-alias cp='nocorrect cp -i'
-alias mkdir='nocorrect mkdir'
-alias rm='nocorrect rm -i'
-alias ptouch='touch tmp/restart.txt'
-alias nano='vim'
-alias spec='spec -c -f specdoc'
-which parallel >/dev/null 2>&1 && alias rake='parallel -u rake :::'
-
 ## Things to set up if I'm in the 'sudo' group
 if [ "$UID" -ge $base_uid ]; then
   if [ "$IS_OSX" ]; then
