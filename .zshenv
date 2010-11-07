@@ -24,14 +24,13 @@ if [ $UID -ge $base_uid ] || [ $UID = 0 ]; then
     /opt/homebrew/bin
     /opt/homebrew/sbin
     /var/lib/gems/1.8/bin/
+    /usr/X11R6/bin /usr/games
     $HOME/bin
   )
 
   path=(
     /usr/local/bin /usr/bin /bin
     /usr/local/sbin /usr/sbin /sbin
-    /usr/X11R6/bin /usr/games
-    $HOME/.gem/ruby/1.8/bin
   )
   for d in $other_path_dirs; do
     [ -d "$d" ] && path=( $d $path )
