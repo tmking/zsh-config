@@ -58,7 +58,7 @@ if which keychain >/dev/null 2>&1 && [[ $UID -ge $base_uid ]]; then
   if which gpg >/dev/null 2>&1; then
     gpg_key=$(gpg --list-keys $USER 2>/dev/null| grep pub | cut -d'/' -f2 | cut -d' ' -f1)
   fi
-  for key in "id_rsa tmk_wat_github_rsa tmk_ygs_github_rsa id_rsa_ygs_demo"; do
+  for key in id_rsa tmk_wat_github_rsa tmk_ygs_github_rsa id_rsa_ygs_demo; do
     [[ -f $HOME/.ssh/$key ]] && keys+="$key "
   done
   eval `keychain -q -Q --eval $keys $gpg_key`
