@@ -96,7 +96,7 @@ export LESS="-ciqR -x4 -P ?f%f .?m(file %i of %m) .?ltlines%lt-%lb?L/%L. .byte %
 export UNAME=$(uname -r)
 export WHOIS_HIDE=1
 export PAGER=less
-export EDITOR=nano
+export EDITOR=vim
 export VISUAL=$EDITOR
 
 ## zsh variables
