@@ -13,7 +13,7 @@
 
 ## populate some arrays
 cdpath=( . ~/ )
-fignore=(.o .c~ \~ .\~ .DS_Store)
+fignore=(.zwc .o .c~ \~ .\~ .DS_Store)
 
 case $fpath[-1] in
   $ZDOTDIR/functions*)
