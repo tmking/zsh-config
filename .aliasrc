@@ -44,4 +44,3 @@ else
   alias rm='rm -i'
 fi
 
-which parallel >/dev/null 2>&1 && alias rake='parallel -u rake :::'
