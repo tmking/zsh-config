@@ -2,10 +2,10 @@
 
 local files args
 
-files=( ~student/playlists/**/*(N.) )
+files=( /home/music/playlists/**/*(N.) /Volumes/music/playlists/**/*(N.) $PWD/*(N.) )
 
 case ${#words} in
-    2)	
+    2)
     	case $words[2] in
 	    */*) _files ;;
 	    *)   _values "$words[1] playlist:" $files:t	;;
