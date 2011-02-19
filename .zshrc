@@ -23,7 +23,7 @@ case $fpath[-1] in
 esac
 
 hosts=( `</etc/hosts| grep -v \#` )
-[ -e "$HOME/.ssh/config" ] && hosts+=(
+[[ -e "$HOME/.ssh/config" ]] && hosts+=(
 `grep -w Host ~/.ssh/config | sed 's/=//g' | cut -d' ' -f2 | tr -d '*'`
 )
 
@@ -137,8 +137,7 @@ bindkey '3C' forward-word
 bindkey '\e[2~' end-of-history           #insert
 
 # for OS X
-bindkey 'π' history-search-backward
-bindkey '˜' history-search-forward
+bindkey "^[r" history-incremental-search-forward
 bindkey '\033[5D' backward-word
 bindkey '\033[5C' forward-word
 

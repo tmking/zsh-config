@@ -134,10 +134,10 @@ prompt_zork_git_func()
     psvar[2]=" git$lp$clr[git_dirty]$branch$rp"
     ;;
     *"Untracked files"*)
-    psvar[2]="git$lp$clr[git_untracked]$branch$rp"
+    psvar[2]=" git$lp$clr[git_untracked]$branch$rp"
     ;;
     *"Changes to be committed"*)
-    psvar[2]="git$lp$clr[git_commits]$branch$rp"
+    psvar[2]=" git$lp$clr[git_commits]$branch$rp"
   esac
 }
 
@@ -153,7 +153,9 @@ prompt_zork_is_console()
 
 prompt_zork_rvm_func()
 {
-  if ([ ${rvm_gemset_name+1} ] && [ ! -e "$PWD/.rvmrc" ]); then
+  rvm_gemset=$(echo $GEM_HOME | cut -d'@' -f2)
+
+  if ([ ${gemset+1} ] && [ ! -e "$PWD/.rvmrc" ]); then
     case $PWD in
         $OLDPWD*) : ;;
         *) rvm default
@@ -182,7 +184,7 @@ prompt_zork_precmd()
   unset psvar
 
   prompt_zork_git_func
-  prompt_zork_ls_count
+  #prompt_zork_ls_count
 
   local jobs=
   local j=${(Mw)#jobstates#suspended:}
