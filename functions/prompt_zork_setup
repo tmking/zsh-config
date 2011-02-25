@@ -1,5 +1,4 @@
-prompt_zork_help()
-{
+prompt_zork_help() {
   cat <<EOF
   We honor the following settings from the file $ZDOTDIR/.promptrc:
 
@@ -37,14 +36,12 @@ prompt_zork_help()
 EOF
 }
 
-prompt_zork_preview()
-{
+prompt_zork_preview() {
   psvar[2]=""
   prompt_preview_theme zork nogit "$@"
 }
 
-prompt_zork_set_colors()
-{
+prompt_zork_set_colors() {
   case $2 in
     BLACK|RED|GREEN|YELLOW|BLUE|MAGENTA|CYAN|WHITE)
     clr[$1]="%b%B%F{${(L)2}}"
@@ -55,8 +52,7 @@ prompt_zork_set_colors()
   esac
 }
 
-prompt_zork_parse_args()
-{
+prompt_zork_parse_args() {
   while [ -n "$*" ]; do
     case $1 in
       -p|--paren)
@@ -99,8 +95,7 @@ prompt_zork_parse_args()
   done
 }
 
-prompt_zork_ls_count()
-{
+prompt_zork_ls_count() {
   if [ -n "$show_files" ]; then
     local -a f hf
     f=( *(.N) )
@@ -118,31 +113,32 @@ prompt_zork_ls_count()
   fi
 }
 
-prompt_zork_git_func()
-{
-  [ -d "$PWD/.git" ] && [ -x "$(which git)" ] || return
+prompt_zork_set_git_branch() {
+  export GIT_BRANCH=${$(git branch --no-color |sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'):-UNNAMED}
 
-  local branch=${$(git branch | grep \* | cut -d' ' -f2):-UNNAMED}
+}
+
+prompt_zork_git_func() {
+  [ -d "$PWD/.git" ] && [ -x "$(which git)" ] || return
 
   psvar[9]=" [ git:$branch ]"
 
   case $(git --no-pager status) in
     *"nothing to commit"*)
-    psvar[2]=" git$lp$clr[lite]$branch$rp"
+    psvar[2]=" git$lp$clr[lite]$GIT_BRANCH$rp"
     ;;
     *"not staged"*)
-    psvar[2]=" git$lp$clr[git_dirty]$branch$rp"
+    psvar[2]=" git$lp$clr[git_dirty]$GIT_BRANCH$rp"
     ;;
     *"Untracked files"*)
-    psvar[2]=" git$lp$clr[git_untracked]$branch$rp"
+    psvar[2]=" git$lp$clr[git_untracked]$GIT_BRANCH$rp"
     ;;
     *"Changes to be committed"*)
-    psvar[2]=" git$lp$clr[git_commits]$branch$rp"
+    psvar[2]=" git$lp$clr[git_commits]$GIT_BRANCH$rp"
   esac
 }
 
-prompt_zork_is_console()
-{
+prompt_zork_is_console() {
   case $TERM in
     xterm*|*rxvt*|Eterm*|cygwin*)
     return 1 ;;
@@ -151,8 +147,7 @@ prompt_zork_is_console()
   esac
 }
 
-prompt_zork_rvm_func()
-{
+prompt_zork_rvm_func() {
   rvm_gemset=$(echo $GEM_HOME | cut -d'@' -f2)
 
   if ([ ${gemset+1} ] && [ ! -e "$PWD/.rvmrc" ]); then
@@ -163,25 +158,31 @@ prompt_zork_rvm_func()
   fi
 }
 
-prompt_zork_preexec()
-{
+prompt_zork_preexec() {
   prompt_zork_is_console && return
-  prompt_zork_rvm_func
   titlebar_length=${TB_LENGTH:-$titlebar_length}
+
   case $1 in
     %*)
-    cmd=%%$1:gs/%//
-    ;;
+      cmd=%%$1:gs/%//
+      ;;
+    "git co"*|"git checkout"*)
+      export need_to_set_git_branch=1
+      ;;
     *)
-    cmd="$(echo $1 | tr \\n " ")"
+      cmd="$(echo $1 | tr \\n " ")"
   esac
 
   print -Pn "%{\e]0;[ $host ] [ %n ] [ %D{$hr}:%D{%M}: %$titlebar_length>...>% $cmd%>> ]\a%}"
 }
 
-prompt_zork_precmd()
-{
+prompt_zork_precmd() {
   unset psvar
+
+  if [[ -n $need_to_set_git_branch ]]; then
+    unset need_to_set_git_branch
+    prompt_zork_set_git_branch
+  fi
 
   prompt_zork_git_func
   #prompt_zork_ls_count
@@ -197,10 +198,18 @@ prompt_zork_precmd()
   prompt_zork_is_console || print -Pn "%{\e]0;[ $host ] [ %n ] [ %30<...<%2c%<< ]%9v [ %h:%l ]$jobs\a%}"
 }
 
-prompt_zork_setup()
-{
+prompt_zork_chpwd() {
+  prompt_zork_rvm_func
+  prompt_zork_set_git_branch
+}
+
+prompt_zork_setup() {
   [ "$1" = "nogit" ] && psvar[2]=""
   prompt_opts=( bang cr subst percent )
+
+  if [[ -z $GIT_BRANCH ]]; then
+    prompt_zork_set_git_branch
+  fi
 
   typeset -Ag clr
   if [ "$UID" = 0 ]; then
@@ -307,6 +316,7 @@ ${ps_line3} "
 
   add-zsh-hook precmd prompt_zork_precmd
   add-zsh-hook preexec prompt_zork_preexec
+  add-zsh-hook chpwd prompt_zork_chpwd
 }
 
 prompt_zork_setup "$@"
