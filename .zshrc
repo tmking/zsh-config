@@ -55,7 +55,7 @@ if which keychain >/dev/null 2>&1 && [[ $UID -ge $base_uid ]]; then
 
   [[ -d $ZDOTDIR/keys ]] && keys+=( $ZDOTDIR/keys/* )
 
-  eval `keychain -q -Q --eval $keys:t $gpg_key`
+  eval `keychain -q -Q --eval $keys:t(N) $gpg_key`
 fi
 unset gpg_key keys key
 
@@ -92,7 +92,7 @@ export WHOIS_HIDE=1
 export PAGER=less
 export EDITOR=vim
 export VISUAL=$EDITOR
-export VIM_APP_DIR=/opt/homebrew/Cellar/macvim/v7.3-53
+export VIM_APP_DIR=/opt/homebrew/Cellar/macvim/7.3-57
 
 ## zsh variables
 NULLCMD=:

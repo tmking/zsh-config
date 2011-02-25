@@ -130,7 +130,7 @@ prompt_zork_git_func()
     *"nothing to commit"*)
     psvar[2]=" git$lp$clr[lite]$branch$rp"
     ;;
-    *"not updated"*)
+    *"not staged"*)
     psvar[2]=" git$lp$clr[git_dirty]$branch$rp"
     ;;
     *"Untracked files"*)
