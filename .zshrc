@@ -22,9 +22,8 @@ case $fpath[-1] in
   fpath=( $ZDOTDIR/**/*(/N) $fpath )
 esac
 
-hosts=( `</etc/hosts| grep -v \#` )
 [[ -e "$HOME/.ssh/config" ]] && hosts+=(
-`grep -w Host ~/.ssh/config | sed 's/=//g' | cut -d' ' -f2 | tr -d '*'`
+  ${${=${(M)${(f)"$(<~/.ssh/config)"}:#Host*}#Host }:#*[\*\?]*}
 )
 
 ## load some global zsh functions
@@ -55,13 +54,13 @@ esac
 export GPG_TTY=$(tty)
 keys=()
 if which keychain >/dev/null 2>&1 && [[ $UID -ge $base_uid ]]; then
-  if which gpg >/dev/null 2>&1; then
-    gpg_key=$(gpg --list-keys $USER 2>/dev/null| grep pub | cut -d'/' -f2 | cut -d' ' -f1)
+  if which gpg >/dev/null 2>&1 && [[ -e $HOME/.gnupg/pubring.gpg ]]; then
+    gpg_key="EE946A6E"
   fi
-  for key in id_rsa tmk_wat_github_rsa tmk_ygs_github_rsa id_rsa_ygs_demo; do
-    [[ -f $HOME/.ssh/$key ]] && keys+="$key"
-  done
-  eval `keychain -q -Q --eval $keys $gpg_key`
+
+  [[ -d $ZDOTDIR/keys ]] && keys+=( $ZDOTDIR/keys/* )
+
+  eval `keychain -q -Q --eval $keys:t $gpg_key`
 fi
 unset gpg_key keys key
 
@@ -98,6 +97,7 @@ export WHOIS_HIDE=1
 export PAGER=less
 export EDITOR=vim
 export VISUAL=$EDITOR
+export VIM_APP_DIR=/opt/homebrew/Cellar/macvim/v7.3-53
 
 ## zsh variables
 NULLCMD=:

@@ -16,7 +16,6 @@ alias grep='grep --color'
 
 alias spec='spec -c -f specdoc'
 alias ptouch='touch tmp/restart.txt'
-alias sc='./script/console'
 
 if ls --version | grep -q GNU; then
   ls_args="-AFhs --color=yes --show-control-chars -I .DS_Store -I .localized"

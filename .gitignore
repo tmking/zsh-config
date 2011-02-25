@@ -6,3 +6,5 @@
 .promptrc
 TODO
 .#*
+keys/*
+!keys/.gitkeep

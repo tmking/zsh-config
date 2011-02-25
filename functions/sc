@@ -1,0 +1,5 @@
+if [[ -e $PWD/config.ru ]]; then
+  rails console
+else
+  ./script/console
+fi
