@@ -113,14 +113,18 @@ prompt_zork_ls_count() {
   fi
 }
 
+prompt_zork_use_git() {
+  [ -d "$PWD/.git" ] && [ -x "$(which git)" ] || return 1
+}
+
 prompt_zork_set_git_branch() {
+  prompt_zork_use_git || return
   export GIT_BRANCH=${$(git branch --no-color |sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'):-UNNAMED}
 
 }
 
 prompt_zork_git_func() {
-  [ -d "$PWD/.git" ] && [ -x "$(which git)" ] || return
-
+  prompt_zork_use_git || return
   psvar[9]=" [ git:$branch ]"
 
   case $(git --no-pager status) in
