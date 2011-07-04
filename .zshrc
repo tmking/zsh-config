@@ -53,7 +53,7 @@ if which keychain >/dev/null 2>&1 && [[ $UID -ge $base_uid ]]; then
     gpg_key="EE946A6E"
   fi
 
-  [[ -d $ZDOTDIR/keys ]] && keys+=( $ZDOTDIR/keys/* )
+  [[ -d $ZDOTDIR/keys ]] && keys+=( $ZDOTDIR/keys/*(N) )
 
   eval `keychain -q -Q --eval $keys:t(N) $gpg_key`
 fi
