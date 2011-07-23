@@ -125,7 +125,7 @@ prompt_zork_set_git_branch() {
 
 prompt_zork_git_func() {
   prompt_zork_use_git || return
-  psvar[9]=" [ git:$branch ]"
+  psvar[9]=" [ git:$GIT_BRANCH ]"
 
   case $(git --no-pager status) in
     *"nothing to commit"*)
