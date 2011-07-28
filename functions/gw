@@ -1,4 +1,4 @@
 # show gateway
-[[ $(uname) == Darwin ]] && return
+[[ `uname` == Darwin ]] && return
 
 route -n | grep UG | cut -d' ' -f10

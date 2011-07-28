@@ -85,6 +85,9 @@ fi
 
 ## misc system variables
 export MAILHOST=$HOSTNAME
+if [[ -x /opt/homebrew/bin/src-hilite-lesspipe.sh ]]; then
+  export LESSOPEN="| /opt/homebrew/bin/src-hilite-lesspipe.sh %s"
+fi
 export LESS="-ciqR -x4 -P ?f%f .?m(file %i of %m) .?ltlines%lt-%lb?L/%L. .byte %bB?s/%s. ?e(END) :?pB%pB\%..%t"
 [ -x "$(which lesspipe)" ] && eval `lesspipe`
 export UNAME=$(uname -r)
@@ -92,7 +95,6 @@ export WHOIS_HIDE=1
 export PAGER=less
 export EDITOR=vim
 export VISUAL=$EDITOR
-export VIM_APP_DIR=/opt/homebrew/Cellar/macvim/7.3-57
 
 ## zsh variables
 NULLCMD=:
