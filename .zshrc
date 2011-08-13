@@ -152,7 +152,7 @@ setopt auto_pushd
 setopt auto_resume
 setopt cdable_vars
 setopt correct
-setopt extendedglob
+setopt noextendedglob
 setopt function_argzero
 setopt hashlistall
 setopt hashdirs
