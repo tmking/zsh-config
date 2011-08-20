@@ -1,5 +1,8 @@
 if [[ -e $PWD/config.ru ]]; then
-  rails console
+  bundle exec rails console
 else
+  if [[ -d vendor/bundle ]]; then
+    GEM_PATH=$PWD/vendor/bundle
+  fi
   ./script/console
 fi

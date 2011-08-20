@@ -9,7 +9,8 @@
 . $ZDOTDIR/.aliasrc 2>/dev/null
 #. $HOME/.aliasrc 2>/dev/null
 
-[ -x $HOME/.rvm/scripts/rvm ] && . $HOME/.rvm/scripts/rvm
+#[ -x $HOME/.rvm/scripts/rvm ] && . $HOME/.rvm/scripts/rvm
+eval "$(rbenv init -)"
 
 ## populate some arrays
 cdpath=( . ~/ )

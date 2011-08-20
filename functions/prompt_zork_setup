@@ -131,6 +131,9 @@ prompt_zork_git_func() {
     *"nothing to commit"*)
     psvar[2]=" git$lp$clr[lite]$GIT_BRANCH$rp"
     ;;
+    *"not staged"*"Untracked files"*)
+    psvar[2]=" git$lp$clr[git_dirty_and_untracked]$GIT_BRANCH$rp"
+    ;;
     *"not staged"*)
     psvar[2]=" git$lp$clr[git_dirty]$GIT_BRANCH$rp"
     ;;
@@ -189,6 +192,7 @@ prompt_zork_precmd() {
   fi
 
   prompt_zork_git_func
+  prompt_zork_rbenv_func
   #prompt_zork_ls_count
 
   local jobs=
@@ -202,8 +206,15 @@ prompt_zork_precmd() {
   prompt_zork_is_console || print -Pn "%{\e]0;[ $host ] [ %n ] [ %30<...<%2c%<< ]%9v [ %h:%l ]$jobs\a%}"
 }
 
+prompt_zork_rbenv_func() {
+  which rbenv >/dev/null 2>&1 || return
+  rbenv_version=$(rbenv version | cut -d' ' -f1)
+  psvar[3]=" $clr[dark]ruby$lp$clr[lite]$rbenv_version$rp"
+}
+
 prompt_zork_chpwd() {
-  prompt_zork_rvm_func
+  functions rvm >/dev/null 2>&1 && prompt_zork_rvm_func
+  [[ $PWD:t == crms ]] && [[ -e $PWD/.rvmrc ]] && . $PWD/.rvmrc
   prompt_zork_set_git_branch
 }
 
@@ -229,6 +240,7 @@ prompt_zork_setup() {
   fi
 
   clr[git_untracked]="%F{yellow}"
+  clr[git_dirty_and_untracked]="%B%F{cyan}"
   clr[git_dirty]="%B%F{red}"
   clr[git_commits]="%F{magenta}"
 
@@ -306,8 +318,8 @@ prompt_zork_setup() {
 
   local ps_wdir="$lp$clr[lite]%45<...<%~%<<$rp$clr[dark]"
 
-  local ps_line1="$lb$ps_date$ps_clock$ps_file$ps_dir$ps_tty$ps_com$clr[lite]%1v $rb"
-  local ps_line2="$lb $ps_userhost$ps_wdir$clr[dark]"$'${psvar[2]}'" $rb"
+  local ps_line1="$lb$ps_date$ps_clock$ps_file$ps_dir$ps_tty$ps_com$clr[lite]%1v\$psvar[3] $rb"
+  local ps_line2="$lb $ps_userhost$ps_wdir$clr[dark]\$psvar[2] $rb"
   local ps_line3=" $clr[userhost]%#$clr[dark]-$clr[paren]>$rs"
 
   export PS1="

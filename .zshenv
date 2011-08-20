@@ -26,6 +26,7 @@ if [ $UID -ge $base_uid ] || [ $UID = 0 ]; then
     /var/lib/gems/1.8/bin/
     /usr/X11R6/bin /usr/games
     $HOME/bin
+    $HOME/.rbenv/bin
   )
 
   path=(

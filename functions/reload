@@ -16,14 +16,16 @@ zrecompile -p -- \
     -M $ZDOTDIR/functions/**/*.zwc(N)
 
 for f in $ZDOTDIR/functions/**/*(.N); do
-    case $f in 
+    case $f in
 	*.zwc*) : ;;
 	*)
 	    unfunction $f:t && autoload $f:t
     esac
 done
 
-[ -e "$PWD/.rvmrc" ] && . $PWD/.rvmrc
+if [ -e "$PWD/.rvmrc"  ] && functions rvm >/dev/null 2>&1; then
+  . $PWD/.rvmrc
+fi
 
 precmd 2>/dev/null
 local tstamp=$(( $(date +%S) - $tstamp ))
