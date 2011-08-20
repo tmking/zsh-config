@@ -208,7 +208,7 @@ prompt_zork_precmd() {
 
 prompt_zork_rbenv_func() {
   which rbenv >/dev/null 2>&1 || return
-  rbenv_version=$(rbenv version | cut -d' ' -f1)
+  rbenv_version=$(rbenv version-name)
   psvar[3]=" $clr[dark]ruby$lp$clr[lite]$rbenv_version$rp"
 }
 
