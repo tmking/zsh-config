@@ -1,6 +1,13 @@
 local dirs dir
 dirs=( $PWD/vendor/bundle/ruby/*(/N) )
 
+if [[ -n $ORIGINAL_GEM_PATH ]]; then
+  export GEM_PATH=$ORIGINAL_GEM_PATH
+  unset ORIGINAL_GEM_PATH
+else
+  unset GEM_PATH
+fi
+
 if [[ -n $dirs ]]; then
   if [[ -n $GEM_PATH ]]; then
     export ORIGINAL_GEM_PATH=$GEM_PATH
@@ -13,11 +20,5 @@ if [[ -n $dirs ]]; then
       export GEM_PATH="$dir:$GEM_PATH"
     fi
   done
-else
-  if [[ -n $ORIGINAL_GEM_PATH ]]; then
-    export GEM_PATH=$ORIGINAL_GEM_PATH
-    unset ORIGINAL_GEM_PATH
-  else
-    unset GEM_PATH
-  fi
 fi
+
