@@ -28,6 +28,8 @@ if [ -e "$PWD/.rvmrc"  ] && functions rvm >/dev/null 2>&1; then
 fi
 
 precmd 2>/dev/null
+bundler_gem_path
+bundler_bin_path
 local tstamp=$(( $(date +%S) - $tstamp ))
 print "reloaded in $tstamp seconds"
 
