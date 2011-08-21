@@ -1,0 +1,13 @@
+local dirs dir
+dirs=( $PWD/vendor/bundle/ruby/*/bin(N) )
+
+if [[ -n $dirs ]]; then
+  export OLD_PATH=$PATH
+
+  for dir in $dirs; do
+    export PATH=$dir:$PATH
+  done
+elif [[ -n $OLD_PATH ]]; then
+  export PATH=$OLD_PATH
+  unset OLD_PATH
+fi
