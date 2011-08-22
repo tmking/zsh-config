@@ -1,15 +1,1 @@
-local dirs dir
-dirs=( $PWD/vendor/bundle/ruby/*/bin(N) )
-
-if [[ -n $OLD_PATH ]]; then
-  export PATH=$OLD_PATH
-  unset OLD_PATH
-fi
-
-if [[ -n $dirs ]]; then
-  export OLD_PATH=$PATH
-
-  for dir in $dirs; do
-    export PATH=$dir:$PATH
-  done
-fi
+../plugins/bundler-path-helpers/functions/bundler_bin_path

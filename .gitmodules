@@ -1,0 +1,3 @@
+[submodule "plugins/bundler-path-helpers"]
+	path = plugins/bundler-path-helpers
+	url = git@github.com:lordzork/zsh-bundler-path-helpers.git
