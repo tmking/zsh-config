@@ -240,8 +240,8 @@ prompt_zork_setup() {
   fi
 
   clr[git_untracked]="%F{yellow}"
-  clr[git_dirty_and_untracked]="%B%F{cyan}"
   clr[git_dirty]="%B%F{red}"
+  clr[git_dirty_and_untracked]="%b%F{3}"
   clr[git_commits]="%F{magenta}"
 
   ## these variables can't be local because
