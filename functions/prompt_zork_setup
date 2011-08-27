@@ -16,12 +16,6 @@ prompt_zork_help() {
 
   ## the following should be left empty to disable features
   ##
-  ## show a count of regular vs. hidden directories
-  show_dirs=yes
-
-  ## show a count of regular vs. hidden files
-  show_files=yes
-
   ## show the number of the terminal device
   show_tty=yes
 
@@ -76,12 +70,6 @@ prompt_zork_parse_args() {
       --clock)
       show_clock=yes
       ;;
-      --files)
-      show_files=yes
-      ;;
-      --dirs)
-      show_dirs=yes
-      ;;
       --tty)
       show_tty=yes
       ;;
@@ -93,24 +81,6 @@ prompt_zork_parse_args() {
     esac
     shift
   done
-}
-
-prompt_zork_ls_count() {
-  if [ -n "$show_files" ]; then
-    local -a f hf
-    f=( *(.N) )
-    hf=( .*(.N) )
-    psvar[5]=${#f}
-    psvar[6]=${#hf}
-  fi
-
-  if [ -n "$show_dirs" ]; then
-    local -a d hd
-    d=( *(/N) )
-    hd=( .*(/N) )
-    psvar[7]=${#d}
-    psvar[8]=${#hd}
-  fi
 }
 
 prompt_zork_use_git() {
@@ -193,7 +163,6 @@ prompt_zork_precmd() {
 
   prompt_zork_git_func
   prompt_zork_rbenv_func
-  #prompt_zork_ls_count
 
   local jobs=
   local j=${(Mw)#jobstates#suspended:}
@@ -254,8 +223,6 @@ prompt_zork_setup() {
   local show_clock=1
   local show_tty=1
   local show_commands=1
-  local show_files=
-  local show_dirs=
 
   local str_clock=lc
   local str_date=d
@@ -293,10 +260,6 @@ prompt_zork_setup() {
   local ps_date=" $clr[dark]$str_date$lp%D{%m}$slash%D{%d}$slash%D{%y}$rp"
   [ "$show_clock" ] &&
   local ps_clock=" $clr[dark]$str_clock$lp%D{$hr}$colon%D{%M}$colon%D{%S}$rp"
-  [ "$show_files" ] &&
-  local ps_file=" $clr[dark]$str_file$lp%5v$slash%6v$rp"
-  [ "$show_dirs" ] &&
-  local ps_dir=" $clr[dark]$str_dir$lp%7v$slash%8v$rp"
   if [ "$show_tty" ]; then
     if prompt_zork_is_console; then
       local str_tty=tty
