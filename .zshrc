@@ -34,7 +34,7 @@ promptinit
 zmodload -i zsh/stat
 
 ## load personal functions
-myfunctions=( $ZDOTDIR/functions/**/*(N) $ZDOTDIR/Completion/**/*(N) )
+myfunctions=( $ZDOTDIR/functions/**/*(N) $ZDOTDIR/Completion/**/*(N) $ZDOTDIR/plugins/*/functions/*(N) )
 for f in ${myfunctions%*.old}; do
   [ -f "$f:r.zwc" ] || zcompile -M $f
   autoload $f:t
