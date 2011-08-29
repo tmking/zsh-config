@@ -10,7 +10,7 @@
 #. $HOME/.aliasrc 2>/dev/null
 
 #[ -x $HOME/.rvm/scripts/rvm ] && . $HOME/.rvm/scripts/rvm
-eval "$(rbenv init -)"
+[[ -e $HOME/.rbenv/bin/rbenv ]] && eval "$(rbenv init -)"
 
 ## populate some arrays
 cdpath=( . ~/ )
