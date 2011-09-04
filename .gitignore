@@ -7,4 +7,5 @@
 TODO
 .#*
 keys/*
+keys/id_rsa
 !keys/.gitkeep
