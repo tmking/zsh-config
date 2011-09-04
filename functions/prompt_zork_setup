@@ -89,7 +89,7 @@ prompt_zork_use_git() {
 
 prompt_zork_set_git_branch() {
   prompt_zork_use_git || return
-  export GIT_BRANCH=${$(git branch --no-color >2/dev/null|sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/' 2>/dev/null):-UNNAMED}
+  export GIT_BRANCH=${$(git branch --no-color 2>/dev/null|sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/' 2>/dev/null):-UNNAMED}
 
 }
 
