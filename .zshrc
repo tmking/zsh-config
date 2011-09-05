@@ -46,6 +46,8 @@ compdef _tar star
 ## load prompt.
 prompt zork
 
+bundler_paths
+
 ## start ssh keychain and source files
 export GPG_TTY=$(tty)
 keys=()
