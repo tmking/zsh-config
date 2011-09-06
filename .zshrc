@@ -140,6 +140,8 @@ bindkey '\e[2~' end-of-history           #insert
 bindkey "^[r" history-incremental-search-forward
 bindkey '\033[5D' backward-word
 bindkey '\033[5C' forward-word
+bindkey '^[[1;9D' backward-word
+bindkey '^[[1;9C' forward-word
 
 bindkey '\e[5~' history-search-backward  #page up
 bindkey '\e[6~' history-search-forward   #page down
