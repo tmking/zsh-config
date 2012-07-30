@@ -1,0 +1,1 @@
+/usr/local/Cellar/rbenv/0.3.0/completions/rbenv.zsh

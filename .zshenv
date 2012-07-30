@@ -21,8 +21,6 @@ if [ $UID -ge $base_uid ] || [ $UID = 0 ]; then
   other_path_dirs=(
     /opt/local/bin
     /opt/local/sbin
-    /opt/homebrew/bin
-    /opt/homebrew/sbin
     /var/lib/gems/1.8/bin/
     /usr/X11R6/bin /usr/games
     $HOME/bin
@@ -36,6 +34,10 @@ if [ $UID -ge $base_uid ] || [ $UID = 0 ]; then
   for d in $other_path_dirs; do
     [ -d "$d" ] && path=( $d $path )
   done
+
+  if which brew >/dev/null 2>&1; then
+    path=( $(/usr/local/bin/brew --prefix coreutils)/libexec/gnubin $path )
+  fi
 
   unset other_path_dirs
 else

@@ -10,7 +10,7 @@ alias rdiff-backup='sudo rdiff-backup'
 alias unrar='unrar e -kb -o+'
 alias nslookup='nslookup -sil'
 alias htop='sudo htop'
-alias dict='dict -c /opt/homebrew/etc/dict.conf'
+alias dict='dict -c /usr/local/etc/dict.conf'
 alias nano='vim'
 alias grep='grep --color'
 

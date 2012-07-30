@@ -10,7 +10,7 @@
 #. $HOME/.aliasrc 2>/dev/null
 
 #[ -x $HOME/.rvm/scripts/rvm ] && . $HOME/.rvm/scripts/rvm
-[[ -e $HOME/.rbenv/bin/rbenv ]] && eval "$(rbenv init -)"
+[[ -d $HOME/.rbenv ]] && eval "$(rbenv init -)"
 
 ## populate some arrays
 cdpath=( . ~/ )
@@ -34,7 +34,11 @@ promptinit
 zmodload -i zsh/stat
 
 ## load personal functions
-myfunctions=( $ZDOTDIR/functions/**/*(N) $ZDOTDIR/Completion/**/*(N) $ZDOTDIR/plugins/*/functions/*(N) )
+myfunctions=(
+  $ZDOTDIR/functions/**/*(N)
+  $ZDOTDIR/Completion/**/*(N)
+  $ZDOTDIR/plugins/*/functions/*(N)
+  )
 for f in ${myfunctions%*.old}; do
   [ -f "$f:r.zwc" ] || zcompile -M $f
   autoload $f:t
@@ -177,6 +181,7 @@ if [ "$UID" -ge $base_uid ]; then
     which gpgdir >/dev/null 2>&1 && alias gpgdir='gpgdir -u $HOME -a'
     alias port='sudo port'
     alias launchctl='sudo launchctl'
+    alias brew='brew -v'
 
   elif groups $USER | grep -q sudo; then
     if [ -e /etc/debian_version ]; then
