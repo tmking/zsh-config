@@ -50,7 +50,7 @@ compdef _tar star
 ## load prompt.
 prompt zork
 
-bundler_paths
+[[ functions bundler_paths >/dev/null 2>&1 ]] && bundler_paths
 
 ## start ssh keychain and source files
 export GPG_TTY=$(tty)
