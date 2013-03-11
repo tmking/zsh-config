@@ -56,7 +56,7 @@ functions bundler_paths >/dev/null 2>&1 && bundler_paths
 export GPG_TTY=$(tty)
 keys=()
 if which keychain >/dev/null 2>&1 && [[ $UID -ge $base_uid ]]; then
-  if which gpg >/dev/null 2>&1 && [[ -e $HOME/.gnupg/pubring.gpg ]]; then
+  if which gpg-agent >/dev/null 2>&1 && [[ -e $HOME/.gnupg/pubring.gpg ]]; then
     gpg_key="EE946A6E"
   fi
 

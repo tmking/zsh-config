@@ -143,7 +143,7 @@ prompt_zork_preexec() {
     %*)
       cmd=%%$1:gs/%//
       ;;
-    "git co"*|"git checkout"*)
+    "git co"*|"git checkout"* |"git flow"*)
       export need_to_set_git_branch=1
       ;;
     *)
