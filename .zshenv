@@ -5,6 +5,7 @@ export ZDOTDIR=$HOME/.zsh
 export HOSTNAME=$(hostname)
 export LANG=en_US.UTF-8
 export LC_ALL=$LANG
+export POSTGRES_USER=$USER
 
 # these settings tune the ruby garbage collector
 export RUBY_HEAP_MIN_SLOTS=1000000
