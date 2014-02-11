@@ -57,7 +57,7 @@ export GPG_TTY=$(tty)
 keys=()
 if which keychain >/dev/null 2>&1 && [[ $UID -ge $base_uid ]]; then
   if which gpg-agent >/dev/null 2>&1 && [[ -e $HOME/.gnupg/pubring.gpg ]]; then
-    gpg_key="EE946A6E"
+    #gpg_key="EE946A6E"
   fi
 
   [[ -d $ZDOTDIR/keys ]] && keys+=( $ZDOTDIR/keys/*(N) )
