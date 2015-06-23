@@ -1,3 +1,6 @@
 [submodule "plugins/bundler-path-helper"]
 	path = plugins/bundler-path-helper
 	url = git@github.com:lordzork/zsh-bundler-path-helper.git
+[submodule "plugins/git-branch-uat-notifier"]
+	path = plugins/git-branch-uat-notifier
+	url = git://github.com/lordzork/git-branch-uat-notifier.git

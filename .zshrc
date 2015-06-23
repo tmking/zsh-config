@@ -51,6 +51,7 @@ compdef _tar star
 prompt zork
 
 functions bundler_paths >/dev/null 2>&1 && bundler_paths
+functions git_branch_uat_notifier >/dev/null 2>&1 && git_branch_uat_notifier
 
 ## start ssh keychain and source files
 export GPG_TTY=$(tty)

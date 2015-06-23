@@ -18,6 +18,10 @@ local base_uid=500
 
 [ "$(uname)" = 'Darwin' ] && export IS_OSX=yes
 
+if [ "$IS_OSX" ]; then
+  export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
+fi
+
 if [ $UID -ge $base_uid ] || [ $UID = 0 ]; then
   other_path_dirs=(
     /opt/local/bin
