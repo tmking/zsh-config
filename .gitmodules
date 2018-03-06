@@ -4,3 +4,6 @@
 [submodule "plugins/git-branch-uat-notifier"]
 	path = plugins/git-branch-uat-notifier
 	url = git://github.com/lordzork/git-branch-uat-notifier.git
+[submodule "plugins/compare_migrations"]
+	path = plugins/compare_migrations
+	url = git@github.com:tmking/compare_migrations.git
