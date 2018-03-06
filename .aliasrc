@@ -13,6 +13,7 @@ alias htop='sudo htop'
 alias dict='dict -c /usr/local/etc/dict.conf'
 alias nano='vim'
 alias grep='grep --color'
+alias rak='rak --color'
 alias fastspec='rspec -I fast_specs'
 
 alias spec='spec -c -f specdoc'

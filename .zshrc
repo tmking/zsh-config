@@ -38,6 +38,7 @@ myfunctions=(
   $ZDOTDIR/functions/**/*(N)
   $ZDOTDIR/Completion/**/*(N)
   $ZDOTDIR/plugins/*/functions/*(N)
+  $ZDOTDIR/plugins/*/Completion/*(N)
   )
 for f in ${myfunctions%*.old}; do
   [ -f "$f:r.zwc" ] || zcompile -M $f
@@ -53,19 +54,21 @@ prompt zork
 functions bundler_paths >/dev/null 2>&1 && bundler_paths
 functions git_branch_uat_notifier >/dev/null 2>&1 && git_branch_uat_notifier
 
+ssh-add -K $HOME/.ssh/id_rsa
+
 ## start ssh keychain and source files
-export GPG_TTY=$(tty)
-keys=()
-if which keychain >/dev/null 2>&1 && [[ $UID -ge $base_uid ]]; then
-  if which gpg-agent >/dev/null 2>&1 && [[ -e $HOME/.gnupg/pubring.gpg ]]; then
-    #gpg_key="EE946A6E"
-  fi
+#export GPG_TTY=$(tty)
+#keys=()
+#if which keychain >/dev/null 2>&1 && [[ $UID -ge $base_uid ]]; then
+  #if which gpg-agent >/dev/null 2>&1 && [[ -e $HOME/.gnupg/pubring.gpg ]]; then
+    ##gpg_key="EE946A6E"
+  #fi
 
-  [[ -d $ZDOTDIR/keys ]] && keys+=( $ZDOTDIR/keys/*(N) )
+  #[[ -d $ZDOTDIR/keys ]] && keys+=( $ZDOTDIR/keys/*(N) )
 
-  eval `keychain -q -Q --eval $keys:t(N) $gpg_key`
-fi
-unset gpg_key keys key
+  #eval `keychain -Q --eval $keys:t(N) $gpg_key`
+#fi
+#unset gpg_key keys key
 
 ## load color config for ls
 if [ -f /etc/DIR_COLORS ]; then
@@ -103,6 +106,7 @@ export WHOIS_HIDE=1
 export PAGER=less
 export EDITOR=vim
 export VISUAL=$EDITOR
+export BUNDLER_EDITOR=mvim
 
 ## zsh variables
 NULLCMD=:

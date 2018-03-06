@@ -1,6 +1,6 @@
 .history*
 .zcompcache/
-.zcompdump
+.zcompdump*
 .*.zwc*
 *.zwc*
 .promptrc
