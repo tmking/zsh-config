@@ -1,0 +1,50 @@
+setBranchExec()
+{
+    local mode=$1; shift
+    local args="$@"
+    local ls="ls $ls_args"
+
+    case $mode in
+      lsh)
+      eval $ls $args -- * | head -n $1
+      ;;
+      lsf)
+      eval  $ls $args -- "*(.N)"
+      ;;
+      lsd)
+      eval $ls -d $args "*(-/N)"
+      ;;
+      lsl)
+      eval $ls $args "*(@N)" ".*(@N)"
+      ;;
+      lsa)
+      eval $ls $args ".*(.N)"
+    esac
+}
+
+local mode=$0
+typeset -a args dirs
+
+while [ "$*" ]; do
+    if [ -d "$1" ]; then
+	dirs+=$1
+    else
+	case $1 in
+	    -*)
+		args+=$1
+	esac
+    fi
+
+    shift
+
+done
+
+if [ -z "$dirs" ]; then
+    lsExec $mode $args
+else
+    for dir in $dirs; do
+	( cd $dir && print "\n$dir:"
+	    lsExec $mode $args )
+    done
+fi
+
