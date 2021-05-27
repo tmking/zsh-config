@@ -139,6 +139,7 @@ prompt_zork_rvm_func() {
 prompt_zork_preexec() {
   prompt_zork_is_console && return
   titlebar_length=${TB_LENGTH:-$titlebar_length}
+  prompt_zork_set_git_branch
 
   case $1 in
     %*)
@@ -157,10 +158,10 @@ prompt_zork_preexec() {
 prompt_zork_precmd() {
   unset psvar
 
-  if [[ -n $need_to_set_git_branch ]]; then
-    unset need_to_set_git_branch
+  #if [[ -n $need_to_set_git_branch ]]; then
+    #unset need_to_set_git_branch
     prompt_zork_set_git_branch
-  fi
+  #fi
 
   prompt_zork_git_func
   prompt_zork_rbenv_func
