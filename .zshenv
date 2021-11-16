@@ -22,8 +22,12 @@ if [ "$IS_OSX" ]; then
   export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
 fi
 
+export LDFLAGS="-L/usr/local/opt/node@14/lib"
+export CPPFLAGS="-I/usr/local/opt/node@14/include"
+
 if [ $UID -ge $base_uid ] || [ $UID = 0 ]; then
   other_path_dirs=(
+    /usr/local/opt/node@14/bin
     /opt/local/bin
     /opt/local/sbin
     /var/lib/gems/1.8/bin/

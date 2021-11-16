@@ -54,6 +54,10 @@ prompt zork
 functions bundler_paths >/dev/null 2>&1 && bundler_paths
 functions git_branch_uat_notifier >/dev/null 2>&1 && git_branch_uat_notifier
 
+export APPLE_SSH_ADD_BEHAVIOR=macos
+if [[ ! "$SSH_AUTH_SOCK" ]]; then
+  eval `ssh-agent`
+fi
 ssh-add -K $HOME/.ssh/id_rsa
 
 ## start ssh keychain and source files
