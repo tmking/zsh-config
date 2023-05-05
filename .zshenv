@@ -34,6 +34,7 @@ if [ $UID -ge $base_uid ] || [ $UID = 0 ]; then
     /usr/X11R6/bin /usr/games
     $HOME/bin
     $HOME/.rbenv/bin
+    $HOME/.pyenv/shims
   )
 
   path=(

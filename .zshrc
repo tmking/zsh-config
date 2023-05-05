@@ -59,6 +59,7 @@ if [[ ! "$SSH_AUTH_SOCK" ]]; then
   eval `ssh-agent`
 fi
 ssh-add -K $HOME/.ssh/id_rsa
+ssh-add -K $HOME/.ssh/id_ed25519
 
 ## start ssh keychain and source files
 #export GPG_TTY=$(tty)
